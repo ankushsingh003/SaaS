@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../features/auth/authSlice';
-import { Layout, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -22,19 +22,22 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950"></div>
+    <div className="flex min-h-screen items-center justify-center bg-[#020617] px-4 overflow-hidden relative">
+      {/* Background Ambient Glows */}
+      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
       
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20">
-            <Layout className="text-white" size={24} />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl shadow-blue-500/20">
+            <LayoutDashboard className="text-white" size={24} />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Join SaaSify</h1>
-          <p className="mt-2 text-slate-400">Create your account to start managing your data.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-white uppercase">Join SaaSify</h1>
+          <p className="mt-2 text-slate-400 text-xs font-bold uppercase tracking-widest opacity-60">Create your account to start managing your data.</p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 backdrop-blur-xl shadow-2xl">
+        <div className="glass-card rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[40px] rounded-full"></div>
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-500 border border-red-500/20">
