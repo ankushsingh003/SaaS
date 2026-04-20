@@ -57,9 +57,12 @@ api.interceptors.response.use(
                 originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                // Refresh failed, logout user
+                // Refresh failed, logout user if not already on auth pages
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/register';
+                if (!isAuthPage) {
+                    window.location.href = '/login';
+                }
                 return Promise.reject(refreshError);
             }
         }

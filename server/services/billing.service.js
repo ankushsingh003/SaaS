@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
 import Workspace from '../models/Workspace.model.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripeKey = process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.trim() !== '' ? process.env.STRIPE_SECRET_KEY : null;
+const stripe = stripeKey ? new Stripe(stripeKey) : null;
 
 /**
  * Billing Service:

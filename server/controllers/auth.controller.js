@@ -14,14 +14,15 @@ export const register = async (req, res, next) => {
 
         res.status(201).json({
             success: true,
+            token: result.accessToken,
             user: {
                 _id: result._id,
                 name: result.name,
-                email: result.email,
-                token: result.accessToken
+                email: result.email
             }
         });
     } catch (error) {
+        console.error('Registration Error:', error.message);
         res.status(400).json({ success: false, message: error.message });
     }
 };
@@ -40,11 +41,11 @@ export const login = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
+            token: result.accessToken,
             user: {
                 _id: result._id,
                 name: result.name,
-                email: result.email,
-                token: result.accessToken
+                email: result.email
             }
         });
     } catch (error) {

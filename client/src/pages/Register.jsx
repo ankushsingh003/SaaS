@@ -17,7 +17,7 @@ const Register = () => {
     e.preventDefault();
     const result = await dispatch(register({ name, email, password }));
     if (!result.error) {
-      navigate('/');
+      navigate('/create-workspace');
     }
   };
 
@@ -30,8 +30,8 @@ const Register = () => {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20">
             <Layout className="text-white" size={24} />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Create Workspace</h1>
-          <p className="mt-2 text-slate-400">Start your 14-day free trial. No credit card required.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Join SaaSify</h1>
+          <p className="mt-2 text-slate-400">Create your account to start managing your data.</p>
         </div>
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 backdrop-blur-xl shadow-2xl">

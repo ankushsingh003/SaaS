@@ -5,10 +5,9 @@ export const login = createAsyncThunk('auth/login', async (credentials, thunkAPI
     try {
         const response = await api.post('/auth/login', credentials);
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
         return response.data.user;
     } catch (error) {
-        return thunkAPI.rejectWithValue(error.response.data.error || 'Login failed');
+        return thunkAPI.rejectWithValue(error.response.data.message || 'Login failed');
     }
 });
 
@@ -16,10 +15,9 @@ export const register = createAsyncThunk('auth/register', async (userData, thunk
     try {
         const response = await api.post('/auth/register', userData);
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
         return response.data.user;
     } catch (error) {
-        return thunkAPI.rejectWithValue(error.response.data.error || 'Registration failed');
+        return thunkAPI.rejectWithValue(error.response.data.message || 'Registration failed');
     }
 });
 
