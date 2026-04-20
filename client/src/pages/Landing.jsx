@@ -83,7 +83,7 @@ const Landing = () => {
                         {/* Base Tech Image (Bottom Left) */}
                         <div className="absolute top-[20%] left-[-10%] md:left-0 w-[80%] z-10 transition-all duration-700 hover:scale-105 hover:z-30">
                             <img 
-                                src="/tech_1.png" 
+                                src="/portrait_1.png" 
                                 alt="Innovation Base" 
                                 className="w-full h-auto rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] border-4 border-white/10 opacity-60 grayscale"
                             />
@@ -92,7 +92,7 @@ const Landing = () => {
                         {/* Overlapping Tech Image (Top Right) - The Main Face */}
                         <div className="absolute top-[5%] right-[-10%] md:right-[-20%] w-[85%] z-20 transition-all duration-700 hover:scale-110 hover:z-30 filter drop-shadow-[0_20px_20px_rgba(0,0,0,0.5)]">
                             <img 
-                                src="/tech_3.png" 
+                                src="/portrait_3.png" 
                                 alt="Tech Visionary" 
                                 className="w-full h-auto rounded-[3rem] shadow-[0_50px_120px_rgba(0,0,0,0.7)] ring-1 ring-white/20 border-4 border-[#404eed]"
                             />

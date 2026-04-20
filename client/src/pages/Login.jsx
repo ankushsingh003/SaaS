@@ -28,7 +28,7 @@ const Login = () => {
              {/* Back Card: Mark Zuckerberg */}
              <div className="absolute top-[10%] left-0 w-[60%] rotate-[-6deg] z-10 transition-all duration-500 hover:z-40 hover:scale-105">
                 <img 
-                    src="/tech_1.png" 
+                    src="/portrait_1.png" 
                     className="w-full h-auto rounded-[2.5rem] shadow-2xl border-4 border-white/5 opacity-40 grayscale" 
                     alt="Network" 
                 />
@@ -37,7 +37,7 @@ const Login = () => {
             {/* Middle Card: Satya Nadella */}
             <div className="absolute top-[20%] right-[5%] w-[65%] rotate-[3deg] z-20 transition-all duration-500 hover:z-40 hover:scale-105">
                 <img 
-                    src="/tech_2.png" 
+                    src="/portrait_2.png" 
                     className="w-full h-auto rounded-[2.5rem] shadow-2xl border-4 border-white/10 opacity-70" 
                     alt="Innovation" 
                 />
@@ -46,7 +46,7 @@ const Login = () => {
             {/* Front Main Card: Elon Musk */}
             <div className="absolute top-[35%] left-[15%] w-[75%] rotate-[-2deg] z-30 transition-all duration-700 hover:z-40 hover:scale-110">
                 <img 
-                    src="/tech_3.png" 
+                    src="/portrait_3.png" 
                     className="w-full h-auto rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] border-4 border-[#404eed]" 
                     alt="Vision" 
                 />
