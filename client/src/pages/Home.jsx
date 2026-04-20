@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 import { logout } from '../features/auth/authSlice';
-import { fetchWorkspaces, setActiveWorkspace } from '../features/workspaces/workspaceSlice';
+import { fetchWorkspaces } from '../features/workspaces/workspaceSlice';
 import { RevenueChart, UserGrowthChart } from '../components/DashboardCharts';
+import useSocket from '../hooks/useSocket';
 import { 
   LogOut, 
   LayoutDashboard, 
@@ -11,8 +13,8 @@ import {
   BarChart3, 
   Settings, 
   ChevronDown, 
-  Plus,
-  Loader2
+  Loader2,
+  Bell
 } from 'lucide-react';
 
 /**
@@ -20,28 +22,56 @@ import {
  * 1. Checks if user has a workspace.
  * 2. Redirects to /create-workspace if no workspace found.
  * 3. Displays analytics for the active workspace.
+ * 4. Listens for real-time events via Socket.io.
  */
 const Home = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
-    // Auth state: Get current logged in user
+    // Auth state
     const { user } = useSelector((state) => state.auth);
     
-    // Workspace state: Get list of user's workspaces and the active one
+    // Workspace state
     const { list, activeWorkspace, loading } = useSelector((state) => state.workspaces);
 
-    // Initial load: Fetch all workspaces for the user
+    // Initial load: Fetch all workspaces
     useEffect(() => {
         dispatch(fetchWorkspaces());
     }, [dispatch]);
 
-    // Multi-tenancy check: If user has no workspaces after fetch, take them to creation screen
+    // Multi-tenancy check
     useEffect(() => {
         if (!loading && list.length === 0) {
             navigate('/create-workspace');
         }
     }, [list, loading, navigate]);
+
+    // Initialize Real-time Socket Connection
+    // This hook joins the current workspace room and handles auth tokens
+    const socket = useSocket(activeWorkspace?._id);
+
+    // Listen for real-time notifications
+    useEffect(() => {
+        if (!socket) return;
+
+        // Example: Handle a 'notification' event sent from the server
+        socket.on('notification', (payload) => {
+            toast.success(payload.message, {
+              icon: '🚀',
+              style: {
+                borderRadius: '10px',
+                background: '#1e293b',
+                color: '#fff',
+                border: '1px solid #334155'
+              },
+            });
+        });
+
+        // Cleanup listener on unmount
+        return () => {
+            socket.off('notification');
+        };
+    }, [socket]);
 
     if (loading && !activeWorkspace) {
         return (
@@ -53,10 +83,12 @@ const Home = () => {
 
     return (
         <div className="flex h-screen bg-slate-950 text-slate-200">
-            {/* Sidebar with Workspace Switcher */}
+            {/* Global Toast Container for real-time alerts */}
+            <Toaster position="top-right" reverseOrder={false} />
+
+            {/* Sidebar */}
             <aside className="w-68 border-r border-slate-800 bg-slate-900/50 flex flex-col">
                 <div className="p-4">
-                    {/* Brand / Logo */}
                     <div className="flex items-center gap-3 mb-8 px-2">
                         <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
                             <LayoutDashboard size={18} className="text-white" />
@@ -64,7 +96,7 @@ const Home = () => {
                         <span className="font-bold text-xl text-white tracking-tight">SaaSify</span>
                     </div>
                     
-                    {/* Workspace Switcher Component */}
+                    {/* Workspace Switcher */}
                     <div className="relative mb-6">
                         <button className="flex w-full items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-800/40 hover:bg-slate-800 transition-all group">
                             <div className="flex items-center gap-3 overflow-hidden text-left">
@@ -77,7 +109,6 @@ const Home = () => {
                         </button>
                     </div>
 
-                    {/* Navigation Items */}
                     <nav className="space-y-1">
                         <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-600/10 text-blue-400 font-medium">
                             <BarChart3 size={18} />
@@ -94,7 +125,6 @@ const Home = () => {
                     </nav>
                 </div>
                 
-                {/* User Profile & Sign Out (Bottom of Sidebar) */}
                 <div className="mt-auto p-4 border-t border-slate-800">
                     <div className="flex items-center gap-3 mb-4 px-2">
                         <div className="relative">
@@ -118,28 +148,31 @@ const Home = () => {
                 </div>
             </aside>
 
-            {/* Main Content Area */}
+            {/* Main Content */}
             <main className="flex-1 overflow-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/5 via-slate-950 to-slate-950">
-                {/* Header with Plan Info */}
                 <header className="h-16 border-b border-slate-800 bg-slate-900/20 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
                     <div>
                       <h2 className="text-lg font-bold text-white leading-tight">Dashboard Overview</h2>
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Real-time Analytics</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="px-3 py-1 rounded-full bg-blue-600/10 text-blue-400 text-[10px] font-bold border border-blue-600/20 uppercase tracking-widest">
-                            {activeWorkspace?.subscription?.plan || 'Free'} Plan
+                        {/* Real-time Indicator */}
+                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          Live
+                        </div>
+                        <div className="h-8 w-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer">
+                          <Bell size={18} />
                         </div>
                     </div>
                 </header>
 
-                {/* KPI Statistics Grid */}
                 <div className="p-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         {[
                             { label: 'Total Revenue', value: '$24,560', change: '+12.5%', icon: BarChart3, color: 'text-emerald-400' },
                             { label: 'Active Users', value: '1,234', change: '+18.2%', icon: Users, color: 'text-blue-400' },
-                            { label: 'Members', value: activeWorkspace?.members?.length || '1', change: 'Live', icon: LayoutDashboard, color: 'text-purple-400' },
+                            { label: 'Members', value: activeWorkspace?.members?.length || '1', change: 'Online', icon: LayoutDashboard, color: 'text-purple-400' },
                         ].map((stat, i) => (
                             <div key={i} className="p-6 rounded-2xl border border-slate-800 bg-slate-900/50 hover:border-slate-700 transition-all group relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -159,9 +192,7 @@ const Home = () => {
                         ))}
                     </div>
 
-                    {/* Real-time Analytics Charts */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Revenue Trend Area Chart */}
                         <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
                             <div className="flex items-center justify-between mb-6">
                                 <div>
@@ -176,7 +207,6 @@ const Home = () => {
                             <RevenueChart />
                         </div>
 
-                        {/* User Engagement Line Chart */}
                         <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
                             <div className="flex items-center justify-between mb-6">
                                 <div>

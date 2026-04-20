@@ -1,6 +1,5 @@
 import express from 'express';
 import http from 'http';
-import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,6 +8,7 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 
 import connectDB from './config/db.js';
+import initSocket from './config/socket.js';
 import authRoutes from './routes/auth.routes.js';
 import workspaceRoutes from './routes/workspace.routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
@@ -21,13 +21,9 @@ connectDB();
 const app = express();
 const httpServer = http.createServer(app);
 
-// Socket.io Setup
-const io = new Server(httpServer, {
-    cors: {
-        origin: process.env.SOCKET_CORS_ORIGIN || 'http://localhost:5173',
-        methods: ['GET', 'POST']
-    }
-});
+// Initialize Socket.io
+const io = initSocket(httpServer);
+app.set('io', io); // Make io accessible in controllers via req.app.get('io')
 
 // Middleware
 app.use(helmet());
