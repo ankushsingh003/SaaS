@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
+import workspaceRoutes from './routes/workspace.routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
 
 dotenv.config();
@@ -44,6 +45,7 @@ app.use('/api/', limiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/workspaces', workspaceRoutes);
 
 app.get('/', (req, res) => {
     res.send('SaaS Analytics API is running...');

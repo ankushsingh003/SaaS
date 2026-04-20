@@ -69,6 +69,8 @@ export const refreshAccessToken = async (refreshToken) => {
         const newRefreshToken = generateRefreshToken(user._id);
 
         return { accessToken, refreshToken: newRefreshToken };
+    } catch (error) {
+        throw new Error('Invalid refresh token');
     }
 };
 
