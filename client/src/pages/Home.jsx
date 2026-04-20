@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../features/auth/authSlice';
 import { fetchWorkspaces, setActiveWorkspace } from '../features/workspaces/workspaceSlice';
+import { RevenueChart, UserGrowthChart } from '../components/DashboardCharts';
 import { 
   LogOut, 
   LayoutDashboard, 
@@ -158,17 +159,34 @@ const Home = () => {
                         ))}
                     </div>
 
-                    {/* Placeholder for real-time charts */}
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-12 h-80 flex flex-col items-center justify-center text-center backdrop-blur-sm relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-600/5 via-transparent to-transparent"></div>
-                        <div className="p-5 rounded-full bg-slate-800 mb-6 text-slate-500 ring-4 ring-slate-900/50 shadow-inner relative z-10">
-                             <BarChart3 size={40} className="text-blue-500" />
+                    {/* Real-time Analytics Charts */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Revenue Trend Area Chart */}
+                        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 className="text-lg font-bold text-white tracking-tight">Revenue Trend</h3>
+                                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Monthly growth</p>
+                                </div>
+                                <select className="bg-slate-800 border-none text-[10px] uppercase font-bold text-slate-400 rounded-md px-2 py-1 outline-none">
+                                  <option>Last 7 Days</option>
+                                  <option>Last 30 Days</option>
+                                </select>
+                            </div>
+                            <RevenueChart />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2 relative z-10">No data points collected</h3>
-                        <p className="text-slate-400 max-w-sm relative z-10 text-sm">Welcome to <span className="text-blue-400 font-semibold">{activeWorkspace?.name}</span>! Connect your API keys to begin tracking user data.</p>
-                        <button className="mt-8 px-6 py-2 rounded-full bg-white text-slate-950 text-xs font-bold hover:bg-slate-200 transition-all relative z-10">
-                          Setup Tracker
-                        </button>
+
+                        {/* User Engagement Line Chart */}
+                        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 className="text-lg font-bold text-white tracking-tight">Active Users</h3>
+                                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Daily engagement</p>
+                                </div>
+                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                            </div>
+                            <UserGrowthChart />
+                        </div>
                     </div>
                 </div>
             </main>
