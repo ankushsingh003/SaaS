@@ -25,33 +25,33 @@ const Login = () => {
       {/* Left side: Overlapping Image Stack */}
       <div className="hidden lg:flex w-1/2 relative items-center justify-center p-20 bg-gradient-to-br from-blue-900/10 to-transparent border-r border-white/5">
         <div className="relative w-full max-w-lg h-[600px]">
-             {/* Back Card */}
+             {/* Back Card: Mark Zuckerberg */}
              <div className="absolute top-[10%] left-0 w-[60%] rotate-[-6deg] z-10 transition-all duration-500 hover:z-40 hover:scale-105">
                 <img 
-                    src="/hero_office_1.png" 
-                    className="w-full h-auto rounded-[2rem] shadow-2xl border-4 border-white/5 opacity-40 grayscale" 
-                    alt="Stack 1" 
+                    src="/tech_1.png" 
+                    className="w-full h-auto rounded-[2.5rem] shadow-2xl border-4 border-white/5 opacity-40 grayscale" 
+                    alt="Network" 
                 />
             </div>
 
-            {/* Middle Card */}
+            {/* Middle Card: Satya Nadella */}
             <div className="absolute top-[20%] right-[5%] w-[65%] rotate-[3deg] z-20 transition-all duration-500 hover:z-40 hover:scale-105">
                 <img 
-                    src="/hero_office_2.png" 
-                    className="w-full h-auto rounded-[2rem] shadow-2xl border-4 border-white/10 opacity-70" 
-                    alt="Stack 2" 
+                    src="/tech_2.png" 
+                    className="w-full h-auto rounded-[2.5rem] shadow-2xl border-4 border-white/10 opacity-70" 
+                    alt="Innovation" 
                 />
             </div>
 
-            {/* Front Main Card */}
-            <div className="absolute top-[35%] left-[15%] w-[70%] rotate-[-2deg] z-30 transition-all duration-700 hover:z-40 hover:scale-110">
+            {/* Front Main Card: Elon Musk */}
+            <div className="absolute top-[35%] left-[15%] w-[75%] rotate-[-2deg] z-30 transition-all duration-700 hover:z-40 hover:scale-110">
                 <img 
-                    src="/ui_card.png" 
-                    className="w-full h-auto rounded-[2rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] border-4 border-[#404eed]" 
-                    alt="Main UI Card" 
+                    src="/tech_3.png" 
+                    className="w-full h-auto rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] border-4 border-[#404eed]" 
+                    alt="Vision" 
                 />
-                <div className="absolute -top-4 -right-4 p-4 rounded-2xl bg-[#404eed] text-white shadow-xl animate-bounce">
-                    <Layout size={24} />
+                <div className="absolute -top-4 -right-4 p-5 rounded-3xl bg-[#404eed] text-white shadow-xl animate-bounce">
+                    <Layout size={28} />
                 </div>
             </div>
 
