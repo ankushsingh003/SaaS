@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { logout } from '../features/auth/authSlice';
 import { fetchWorkspaces } from '../features/workspaces/workspaceSlice';
@@ -14,7 +14,8 @@ import {
   Settings, 
   ChevronDown, 
   Loader2,
-  Bell
+  Bell,
+  CreditCard
 } from 'lucide-react';
 
 /**
@@ -47,27 +48,21 @@ const Home = () => {
     }, [list, loading, navigate]);
 
     // Initialize Real-time Socket Connection
-    // This hook joins the current workspace room and handles auth tokens
     const socket = useSocket(activeWorkspace?._id);
 
     // Listen for real-time notifications
     useEffect(() => {
         if (!socket) return;
 
-        // Example: Handle a 'notification' event sent from the server
         socket.on('notification', (payload) => {
             toast.success(payload.message, {
               icon: '🚀',
               style: {
-                borderRadius: '10px',
-                background: '#1e293b',
-                color: '#fff',
-                border: '1px solid #334155'
+                borderRadius: '10px', background: '#1e293b', color: '#fff', border: '1px solid #334155'
               },
             });
         });
 
-        // Cleanup listener on unmount
         return () => {
             socket.off('notification');
         };
@@ -83,7 +78,6 @@ const Home = () => {
 
     return (
         <div className="flex h-screen bg-slate-950 text-slate-200">
-            {/* Global Toast Container for real-time alerts */}
             <Toaster position="top-right" reverseOrder={false} />
 
             {/* Sidebar */}
@@ -110,7 +104,7 @@ const Home = () => {
                     </div>
 
                     <nav className="space-y-1">
-                        <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-600/10 text-blue-400 font-medium">
+                        <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-600/10 text-blue-400 font-medium font-bold">
                             <BarChart3 size={18} />
                             Dashboard
                         </a>
@@ -118,6 +112,10 @@ const Home = () => {
                             <Users size={18} />
                             Team
                         </a>
+                        <Link to="/billing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
+                            <CreditCard size={18} />
+                            Billing
+                        </Link>
                         <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
                             <Settings size={18} />
                             Settings
@@ -148,7 +146,7 @@ const Home = () => {
                 </div>
             </aside>
 
-            {/* Main Content */}
+            {/* Main Content Area */}
             <main className="flex-1 overflow-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/5 via-slate-950 to-slate-950">
                 <header className="h-16 border-b border-slate-800 bg-slate-900/20 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10">
                     <div>
@@ -156,11 +154,13 @@ const Home = () => {
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Real-time Analytics</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        {/* Real-time Indicator */}
-                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          Live
-                        </div>
+                        {/* Live Plan Indicator linking to Billing */}
+                        <Link 
+                            to="/billing"
+                            className="px-3 py-1 rounded-full bg-blue-600/10 text-blue-400 text-[10px] font-bold border border-blue-600/20 uppercase tracking-widest hover:bg-blue-600/20 transition-all shadow-inner"
+                        >
+                            {activeWorkspace?.subscription?.plan || 'Free'} Plan
+                        </Link>
                         <div className="h-8 w-8 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer">
                           <Bell size={18} />
                         </div>
