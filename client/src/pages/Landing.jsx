@@ -80,20 +80,20 @@ const Landing = () => {
                     </div>
 
                     <div className="lg:w-1/2 relative h-[500px] md:h-[700px] flex items-center justify-center lg:justify-end">
-                        {/* Shadow Backing Card (Bottom Left) */}
+                        {/* Base Office Image (Bottom Left) */}
                         <div className="absolute top-[20%] left-[-10%] md:left-0 w-[80%] z-10 transition-all duration-700 hover:scale-105 hover:z-30">
                             <img 
-                                src="/ui_card.png" 
-                                alt="Dashboard Mockup Bottom" 
-                                className="w-full h-auto rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] opacity-60 grayscale-[0.3] brightness-75 border-2 border-white/10"
+                                src="/hero_office_1.png" 
+                                alt="Team Space Base" 
+                                className="w-full h-auto rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] border-4 border-white/10"
                             />
                         </div>
                         
-                        {/* Main Interaction Card (Top Right - Overlapping) */}
-                        <div className="absolute top-[5%] right-[-10%] md:right-[-20%] w-[85%] z-20 transition-all duration-700 hover:scale-110 hover:z-30">
+                        {/* Overlapping Office Image (Top Right) */}
+                        <div className="absolute top-[5%] right-[-10%] md:right-[-20%] w-[85%] z-20 transition-all duration-700 hover:scale-110 hover:z-30 filter drop-shadow-[0_20px_20px_rgba(0,0,0,0.5)]">
                             <img 
-                                src="/ui_card.png" 
-                                alt="Dashboard Mockup Top" 
+                                src="/hero_office_2.png" 
+                                alt="Team Space Overlay" 
                                 className="w-full h-auto rounded-[3rem] shadow-[0_50px_120px_rgba(0,0,0,0.7)] ring-1 ring-white/20 border-4 border-[#404eed]"
                             />
                         </div>
