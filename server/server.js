@@ -6,8 +6,10 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 
 import connectDB from './config/db.js';
+import authRoutes from './routes/auth.routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
 
 dotenv.config();
@@ -31,6 +33,7 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -39,7 +42,9 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Routes Placeholder
+// Routes
+app.use('/api/auth', authRoutes);
+
 app.get('/', (req, res) => {
     res.send('SaaS Analytics API is running...');
 });

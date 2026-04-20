@@ -23,6 +23,15 @@ export const register = createAsyncThunk('auth/register', async (userData, thunk
     }
 });
 
+export const getMe = createAsyncThunk('auth/getMe', async (_, thunkAPI) => {
+    try {
+        const response = await api.get('/auth/me');
+        return response.data.user;
+    } catch (error) {
+        return thunkAPI.rejectWithValue(error.response.data.error || 'Failed to fetch user');
+    }
+});
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
@@ -70,6 +79,21 @@ const authSlice = createSlice({
             .addCase(register.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            .addCase(getMe.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getMe.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+                state.isAuthenticated = true;
+            })
+            .addCase(getMe.rejected, (state) => {
+                state.loading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                localStorage.removeItem('token');
+                localStorage.removeItem('refreshToken');
             });
     }
 });

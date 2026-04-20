@@ -1,15 +1,30 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getMe } from './features/auth/authSlice';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">Loading...</div>;
+  }
+  
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      dispatch(getMe());
+    }
+  }, [dispatch]);
+
   return (
     <Router>
       <div className="min-h-screen bg-background">
