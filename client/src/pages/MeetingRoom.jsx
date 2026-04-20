@@ -11,17 +11,20 @@ const MeetingRoom = () => {
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
     
-    // Refs for Video Elements
-    const localVideoRef = useRef(null);
-    const previewVideoRef = useRef(null);
-    
-    // States
     const [isJoined, setIsJoined] = useState(false);
     const [isMicOn, setIsMicOn] = useState(true);
     const [isCamOn, setIsCamOn] = useState(true);
     const [isSharing, setIsSharing] = useState(false);
     const [stream, setStream] = useState(null);
+    const [screenStream, setScreenStream] = useState(null);
     const [lobbyRequests, setLobbyRequests] = useState([]);
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const [isUsersOpen, setIsUsersOpen] = useState(false);
+    
+    // Refs for Video Elements
+    const localVideoRef = useRef(null);
+    const previewVideoRef = useRef(null);
+    const screenVideoRef = useRef(null);
 
     // Handle Camera/Mic Access
     useEffect(() => {
@@ -80,6 +83,48 @@ const MeetingRoom = () => {
     const handleAdmit = (id) => {
         setLobbyRequests(prev => prev.filter(r => r.id !== id));
     };
+
+    // Toggle Screen Share
+    const toggleScreenShare = async () => {
+        if (!isSharing) {
+            try {
+                const sStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true
+                });
+                setScreenStream(sStream);
+                setIsSharing(true);
+
+                // Handle stop from browser UI
+                sStream.getVideoTracks()[0].onended = () => {
+                    stopScreenShare(sStream);
+                };
+            } catch (err) {
+                console.error("Error starting screen share:", err);
+            }
+        } else {
+            stopScreenShare(screenStream);
+        }
+    };
+
+    const stopScreenShare = (sStream) => {
+        if (sStream) {
+            sStream.getTracks().forEach(track => track.stop());
+        }
+        setScreenStream(null);
+        setIsSharing(false);
+    };
+
+    const copyMeetingLink = () => {
+        const link = window.location.href;
+        navigator.clipboard.writeText(link);
+        alert("Meeting link copied to clipboard!");
+    };
+
+    useEffect(() => {
+        if (isSharing && screenVideoRef.current && screenStream) {
+            screenVideoRef.current.srcObject = screenStream;
+        }
+    }, [isSharing, screenStream]);
 
     if (!isJoined) {
         return (
@@ -147,7 +192,10 @@ const MeetingRoom = () => {
                             >
                                 Enter Room
                             </button>
-                            <button className="w-full bg-white border-2 border-slate-100 text-slate-800 py-5 rounded-[2.5rem] font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+                            <button 
+                                onClick={copyMeetingLink}
+                                className="w-full bg-white border-2 border-slate-100 text-slate-800 py-5 rounded-[2.5rem] font-bold flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+                            >
                                 <LinkIcon size={20} /> Copy Link
                             </button>
                         </div>
@@ -193,12 +241,15 @@ const MeetingRoom = () => {
                     
                     {/* Screen Share Window */}
                     {isSharing && (
-                        <div className="col-span-full bg-slate-900 rounded-[3rem] border-4 border-blue-600 overflow-hidden relative shadow-2xl">
-                             <div className="absolute inset-0 bg-blue-600/5 flex items-center justify-center flex-col gap-6">
-                                 <div className="h-24 w-24 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-2xl shadow-blue-600/50 animate-pulse">
-                                    <Monitor size={48} />
-                                 </div>
-                                 <p className="text-3xl font-black text-white italic tracking-tighter">Live Screen Share</p>
+                        <div className="col-span-full lg:col-span-2 bg-slate-900 rounded-[3rem] border-4 border-blue-600 overflow-hidden relative shadow-2xl">
+                             <video 
+                                ref={screenVideoRef}
+                                autoPlay 
+                                playsInline
+                                className="w-full h-full object-contain"
+                             />
+                             <div className="absolute top-6 left-6 bg-blue-600 px-4 py-2 rounded-2xl text-[10px] font-black text-white flex items-center gap-2 uppercase tracking-widest border border-white/10">
+                                 <Monitor size={14} /> Your Screen
                              </div>
                         </div>
                     )}
@@ -276,12 +327,15 @@ const MeetingRoom = () => {
                         {isCamOn ? <VideoIcon size={24} /> : <VideoOff size={24} />}
                     </button>
                     <button 
-                        onClick={() => setIsSharing(!isSharing)}
+                        onClick={toggleScreenShare}
                         className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-all shadow-xl ${isSharing ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-500 hover:text-white border border-white/5'}`}
                     >
                         <Monitor size={24} />
                     </button>
-                    <button className="h-14 w-14 rounded-2xl bg-slate-900 text-slate-500 hover:text-white transition-all flex items-center justify-center border border-white/5">
+                    <button 
+                        onClick={() => alert("Settings coming soon!")}
+                        className="h-14 w-14 rounded-2xl bg-slate-900 text-slate-500 hover:text-white transition-all flex items-center justify-center border border-white/5"
+                    >
                         <MoreVertical size={24} />
                     </button>
                     <button 
@@ -297,8 +351,18 @@ const MeetingRoom = () => {
                         <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></div>
                         <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Secure</span>
                     </div>
-                    <button className="text-slate-500 hover:text-white transition-colors"><MessageSquare size={22} /></button>
-                    <button className="text-slate-500 hover:text-white transition-colors"><Users size={22} /></button>
+                    <button 
+                        onClick={() => setIsChatOpen(!isChatOpen)}
+                        className={`${isChatOpen ? 'text-blue-500' : 'text-slate-500'} hover:text-white transition-colors`}
+                    >
+                        <MessageSquare size={22} />
+                    </button>
+                    <button 
+                        onClick={() => setIsUsersOpen(!isUsersOpen)}
+                        className={`${isUsersOpen ? 'text-blue-500' : 'text-slate-500'} hover:text-white transition-colors`}
+                    >
+                        <Users size={22} />
+                    </button>
                 </div>
             </footer>
         </div>
