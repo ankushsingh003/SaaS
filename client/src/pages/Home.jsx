@@ -110,7 +110,7 @@ const Home = () => {
 
                     <nav className="space-y-1">
                         <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[2px] mb-3 ml-2">Menu</p>
-                        <Link to="/" className="discord-sidebar-item-active">
+                        <Link to="/dashboard" className="discord-sidebar-item-active">
                             <BarChart3 size={18} />
                             Dashboard
                         </Link>

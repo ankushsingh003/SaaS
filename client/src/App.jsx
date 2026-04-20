@@ -9,6 +9,7 @@ import CreateWorkspace from './pages/CreateWorkspace';
 import Pricing from './pages/Pricing';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
+import Landing from './pages/Landing';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
@@ -33,8 +34,17 @@ function App() {
     <Router>
       <div className="min-h-screen bg-background">
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/create-workspace" 
             element={
@@ -64,14 +74,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Pricing />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <Home />
               </ProtectedRoute>
             } 
           />
