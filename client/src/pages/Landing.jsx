@@ -79,27 +79,28 @@ const Landing = () => {
                         </div>
                     </div>
 
-                    <div className="lg:w-1/2 relative h-[400px] md:h-[600px] mt-12 lg:mt-0">
-                        {/* Base Image (Bottom Left) */}
-                        <div className="absolute bottom-0 left-0 w-[70%] z-10 transition-all duration-500 hover:z-30 hover:scale-105">
+                    <div className="lg:w-1/2 relative h-[500px] md:h-[700px] flex items-center justify-center lg:justify-end">
+                        {/* Shadow Backing Card (Bottom Left) */}
+                        <div className="absolute top-[20%] left-[-10%] md:left-0 w-[80%] z-10 transition-all duration-700 hover:scale-105 hover:z-30">
                             <img 
-                                src="/hero_office_1.png" 
-                                alt="Team Working" 
-                                className="w-full h-auto rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.4)] border-4 border-[#404eed]"
+                                src="/ui_card.png" 
+                                alt="Dashboard Mockup Bottom" 
+                                className="w-full h-auto rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] opacity-60 grayscale-[0.3] brightness-75 border-2 border-white/10"
                             />
                         </div>
                         
-                        {/* Overlapping Image (Top Right) */}
-                        <div className="absolute top-0 right-0 w-[75%] z-20 transition-all duration-500 hover:z-30 hover:scale-105">
+                        {/* Main Interaction Card (Top Right - Overlapping) */}
+                        <div className="absolute top-[5%] right-[-10%] md:right-[-20%] w-[85%] z-20 transition-all duration-700 hover:scale-110 hover:z-30">
                             <img 
-                                src="/hero_office_2.png" 
-                                alt="Modern Office" 
-                                className="w-full h-auto rounded-[2.5rem] shadow-[0_30px_60px_rgba(0,0,0,0.5)] border-4 border-[#404eed]/50 backdrop-blur-sm"
+                                src="/ui_card.png" 
+                                alt="Dashboard Mockup Top" 
+                                className="w-full h-auto rounded-[3rem] shadow-[0_50px_120px_rgba(0,0,0,0.7)] ring-1 ring-white/20 border-4 border-[#404eed]"
                             />
                         </div>
 
-                        {/* Accent elements */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/10 rounded-full blur-3xl mix-blend-overlay animate-pulse"></div>
+                        {/* Glow and Aura elements */}
+                        <div className="absolute top-1/2 right-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+                        <div className="absolute bottom-1/4 left-0 w-[300px] h-[300px] bg-indigo-600/10 rounded-full blur-[80px] pointer-events-none"></div>
                     </div>
                 </div>
 
