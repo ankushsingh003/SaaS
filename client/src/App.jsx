@@ -5,6 +5,7 @@ import { getMe } from './features/auth/authSlice';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import CreateWorkspace from './pages/CreateWorkspace';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
@@ -31,6 +32,14 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route 
+            path="/create-workspace" 
+            element={
+              <ProtectedRoute>
+                <CreateWorkspace />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/" 
             element={
