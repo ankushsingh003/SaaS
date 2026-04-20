@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMe } from './features/auth/authSlice';
 import Home from './pages/Home';
+import MeetingRoom from './pages/MeetingRoom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CreateWorkspace from './pages/CreateWorkspace';
@@ -74,6 +75,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Pricing />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/meeting" 
+            element={
+              <ProtectedRoute>
+                <MeetingRoom />
               </ProtectedRoute>
             } 
           />

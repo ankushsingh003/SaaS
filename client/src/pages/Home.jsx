@@ -75,15 +75,15 @@ const Home = () => {
                     </Link>
 
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-12 mb-4 ml-4">Live Hub</p>
-                    <div className="sidebar-item-light">
+                    <Link to="/meeting" className="sidebar-item-light">
                         <Video size={20} />
                         Meeting Room
-                        <span className="tag-pill tag-blue ml-auto">Free</span>
-                    </div>
-                    <div className="sidebar-item-light">
+                        <span className="tag-pill tag-blue ml-auto">Live</span>
+                    </Link>
+                    <Link to="/meeting" className="sidebar-item-light">
                         <Radio size={20} />
                         Live Stream
-                    </div>
+                    </Link>
                 </nav>
 
                 <div className="mt-auto pt-8 border-t border-slate-200">
