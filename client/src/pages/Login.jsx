@@ -16,90 +16,130 @@ const Login = () => {
     e.preventDefault();
     const result = await dispatch(login({ email, password }));
     if (!result.error) {
-      navigate('/');
+      navigate('/dashboard');
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950"></div>
-      
-      <div className="relative z-10 w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20">
-            <Layout className="text-white" size={24} />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Welcome back</h1>
-          <p className="mt-2 text-slate-400">Enter your credentials to access your dashboard</p>
+    <div className="flex min-h-screen bg-[#020617] overflow-hidden">
+      {/* Left side: Overlapping Image Stack */}
+      <div className="hidden lg:flex w-1/2 relative items-center justify-center p-20 bg-gradient-to-br from-blue-900/10 to-transparent border-r border-white/5">
+        <div className="relative w-full max-w-lg h-[600px]">
+             {/* Back Card */}
+             <div className="absolute top-[10%] left-0 w-[60%] rotate-[-6deg] z-10 transition-all duration-500 hover:z-40 hover:scale-105">
+                <img 
+                    src="/hero_office_1.png" 
+                    className="w-full h-auto rounded-[2rem] shadow-2xl border-4 border-white/5 opacity-40 grayscale" 
+                    alt="Stack 1" 
+                />
+            </div>
+
+            {/* Middle Card */}
+            <div className="absolute top-[20%] right-[5%] w-[65%] rotate-[3deg] z-20 transition-all duration-500 hover:z-40 hover:scale-105">
+                <img 
+                    src="/hero_office_2.png" 
+                    className="w-full h-auto rounded-[2rem] shadow-2xl border-4 border-white/10 opacity-70" 
+                    alt="Stack 2" 
+                />
+            </div>
+
+            {/* Front Main Card */}
+            <div className="absolute top-[35%] left-[15%] w-[70%] rotate-[-2deg] z-30 transition-all duration-700 hover:z-40 hover:scale-110">
+                <img 
+                    src="/ui_card.png" 
+                    className="w-full h-auto rounded-[2rem] shadow-[0_50px_100px_rgba(0,0,0,0.8)] border-4 border-[#404eed]" 
+                    alt="Main UI Card" 
+                />
+                <div className="absolute -top-4 -right-4 p-4 rounded-2xl bg-[#404eed] text-white shadow-xl animate-bounce">
+                    <Layout size={24} />
+                </div>
+            </div>
+
+            {/* Ambient Glows */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
         </div>
-
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 backdrop-blur-xl shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="rounded-lg bg-red-500/10 p-3 text-sm text-red-500 border border-red-500/20">
-                {error}
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300 ml-1">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
-                  <Mail size={18} />
-                </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-lg border border-slate-700 bg-slate-800/50 py-2.5 pl-10 pr-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-                  placeholder="name@company.com"
-                  required
-                />
-              </div>
+      </div>
+      
+      {/* Right side: Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-50">
+        <div className="w-full max-w-[380px] space-y-8">
+            <div className="text-center lg:text-left">
+                <h1 className="text-4xl font-black text-white tracking-tighter mb-2 italic">SaaSify</h1>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-[2px]">Enter your credentials</p>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between ml-1">
-                <label className="text-sm font-medium text-slate-300">Password</label>
-                <a href="#" className="text-xs text-blue-400 hover:text-blue-300">Forgot password?</a>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
-                  <Lock size={18} />
+            <div className="glass-card rounded-[2.5rem] p-10 shadow-2xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                    <div className="rounded-xl bg-red-500/10 p-4 text-xs font-bold text-red-400 border border-red-500/20 uppercase tracking-widest">
+                        {error}
+                    </div>
+                    )}
+                    
+                    <div className="space-y-2">
+                        <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                                <Mail size={16} />
+                            </div>
+                            <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="block w-full rounded-xl border border-white/5 bg-white/5 py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-medium"
+                            placeholder="Email Address"
+                            required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="relative group">
+                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 group-focus-within:text-blue-400 transition-colors">
+                                <Lock size={16} />
+                            </div>
+                            <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="block w-full rounded-xl border border-white/5 bg-white/5 py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-slate-600 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all font-medium"
+                            placeholder="Password"
+                            required
+                            />
+                        </div>
+                        <div className="flex justify-end pr-1">
+                            <a href="#" className="text-[10px] font-black text-blue-400 uppercase tracking-widest hover:text-blue-300">Forgot password?</a>
+                        </div>
+                    </div>
+
+                    <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-blue-600/20 hover:bg-blue-500 transition-all disabled:opacity-50 group"
+                    >
+                    {loading ? (
+                        <Loader2 className="animate-spin" size={18} />
+                    ) : (
+                        <>
+                        Sign in
+                        <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={16} />
+                        </>
+                    )}
+                    </button>
+                </form>
+
+                <div className="mt-10 flex items-center gap-4">
+                    <div className="h-[1px] flex-1 bg-white/5"></div>
+                    <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">OR</span>
+                    <div className="h-[1px] flex-1 bg-white/5"></div>
                 </div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-lg border border-slate-700 bg-slate-800/50 py-2.5 pl-10 pr-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
+
+                <div className="mt-10 text-center">
+                    <span className="text-xs font-bold text-slate-500">Don&apos;t have an account? </span>
+                    <Link to="/register" className="text-xs font-black text-blue-400 hover:text-blue-300 uppercase tracking-widest">
+                    Sign up
+                    </Link>
+                </div>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-            >
-              {loading ? (
-                <Loader2 className="animate-spin" size={20} />
-              ) : (
-                <>
-                  Sign in
-                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={18} />
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-8 text-center text-sm">
-            <span className="text-slate-400">Don&apos;t have an account? </span>
-            <Link to="/register" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
-              Create a free workspace
-            </Link>
-          </div>
         </div>
       </div>
     </div>
