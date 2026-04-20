@@ -75,3 +75,18 @@ export const getMembers = async (workspaceId) => {
     const workspace = await Workspace.findById(workspaceId).populate('members.user', 'name email');
     return workspace.members;
 };
+
+export const updateWorkspace = async (workspaceId, updateData) => {
+    const { name } = updateData;
+    const update = { name };
+    
+    // Auto-generate new slug if name is updated
+    if (name) {
+        update.slug = slugify(name, { lower: true });
+    }
+
+    const workspace = await Workspace.findByIdAndUpdate(workspaceId, update, { new: true });
+    if (!workspace) throw new Error('Workspace not found');
+
+    return workspace;
+};

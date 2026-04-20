@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import CreateWorkspace from './pages/CreateWorkspace';
 import Pricing from './pages/Pricing';
 import Team from './pages/Team';
+import Settings from './pages/Settings';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
@@ -47,6 +48,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Team />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } 
           />

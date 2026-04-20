@@ -45,3 +45,12 @@ export const getMembers = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
+
+export const update = async (req, res) => {
+    try {
+        const workspace = await workspaceService.updateWorkspace(req.params.id, req.body);
+        res.status(200).json({ success: true, workspace });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};

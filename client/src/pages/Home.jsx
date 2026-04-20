@@ -116,10 +116,10 @@ const Home = () => {
                             <CreditCard size={18} />
                             Billing
                         </Link>
-                        <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
+                        <Link to="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
                             <Settings size={18} />
                             Settings
-                        </a>
+                        </Link>
                     </nav>
                 </div>
                 
