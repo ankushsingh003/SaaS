@@ -108,10 +108,10 @@ const Home = () => {
                             <BarChart3 size={18} />
                             Dashboard
                         </a>
-                        <a href="#" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
+                        <Link to="/team" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
                             <Users size={18} />
                             Team
-                        </a>
+                        </Link>
                         <Link to="/billing" className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all">
                             <CreditCard size={18} />
                             Billing

@@ -47,3 +47,31 @@ export const getWorkspaceById = async (workspaceId, userId) => {
 
     return workspace;
 };
+
+export const addMember = async (workspaceId, email, role = 'member') => {
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) throw new Error('Workspace not found');
+
+    const user = await User.findOne({ email });
+    if (!user) throw new Error('User not found. They must register first.');
+
+    // Check if already a member
+    const isMember = workspace.members.some(m => m.user.toString() === user._id.toString());
+    if (isMember) throw new Error('User is already a member of this workspace');
+
+    // Add to workspace
+    workspace.members.push({ user: user._id, role });
+    await workspace.save();
+
+    // Add to user
+    await User.findByIdAndUpdate(user._id, {
+        $push: { workspaces: { workspace: workspace._id, role } }
+    });
+
+    return user;
+};
+
+export const getMembers = async (workspaceId) => {
+    const workspace = await Workspace.findById(workspaceId).populate('members.user', 'name email');
+    return workspace.members;
+};
