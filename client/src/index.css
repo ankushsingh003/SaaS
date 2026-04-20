@@ -1,72 +1,97 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: hsl(222.2 84% 4.9%);
-  --color-foreground: hsl(210 40% 98%);
-
-  --color-card: hsl(222.2 84% 4.9%);
-  --color-card-foreground: hsl(210 40% 98%);
-
-  --color-popover: hsl(222.2 84% 4.9%);
-  --color-popover-foreground: hsl(210 40% 98%);
-
-  --color-primary: hsl(217.2 91.2% 59.8%);
-  --color-primary-foreground: hsl(222.2 47.4% 11.2%);
-
-  --color-secondary: hsl(217.2 32.6% 17.5%);
-  --color-secondary-foreground: hsl(210 40% 98%);
-
-  --color-muted: hsl(217.2 32.6% 17.5%);
-  --color-muted-foreground: hsl(215 20.2% 65.1%);
-
-  --color-accent: hsl(217.2 32.6% 17.5%);
-  --color-accent-foreground: hsl(210 40% 98%);
-
-  --color-destructive: hsl(0 62.8% 30.6%);
-  --color-destructive-foreground: hsl(210 40% 98%);
-
-  --color-border: hsl(217.2 32.6% 17.5%);
-  --color-input: hsl(217.2 32.6% 17.5%);
-  --color-ring: hsl(224.3 76.3% 48%);
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-primary: #3b82f6;
+  --color-secondary: #f8fafc;
+  --color-card: #ffffff;
+  --color-border: #e2e8f0;
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
   }
 }
 
 @layer utilities {
-  .glass-card {
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  }
-  
-  .glass-sidebar {
-    background: rgba(11, 14, 20, 0.6);
-    backdrop-filter: blur(24px);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+  /* --- Elite Uplifter Theme --- */
+  .uplifter-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 2.5rem;
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  .glass-nav {
-    background: rgba(11, 14, 20, 0.4);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  .uplifter-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.12);
+    border-color: #3b82f6;
   }
 
-  .text-gradient {
-    background: linear-gradient(to right, #60a5fa, #818cf8, #a78bfa);
+  .uplifter-sidebar {
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+  }
+
+  .tag-pill {
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .tag-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+  .tag-green { background: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
+  .tag-purple { background: #faf5ff; color: #7e22ce; border: 1px solid #f3e8ff; }
+  .tag-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+
+  .sidebar-item-light {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 1.25rem;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .sidebar-item-light:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+
+  .sidebar-item-light-active {
+    background: #ffffff;
+    color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+  }
+
+  .text-gradient-blue {
+    background: linear-gradient(to right, #2563eb, #7c3aed);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+}
 
-  .discord-sidebar-item {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all duration-200 cursor-pointer text-sm font-medium;
-  }
+/* Animations */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.98); }
+}
 
-  .discord-sidebar-item-active {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-500/10 text-blue-400 font-bold border-l-2 border-blue-500 rounded-l-none text-sm;
-  }
+.animate-pulse-soft {
+  animation: pulse-soft 3s infinite ease-in-out;
 }

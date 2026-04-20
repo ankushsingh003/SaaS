@@ -1,235 +1,262 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { logout } from '../features/auth/authSlice';
 import { fetchWorkspaces } from '../features/workspaces/workspaceSlice';
-import { RevenueChart, UserGrowthChart } from '../components/DashboardCharts';
 import useSocket from '../hooks/useSocket';
 import { 
-  LogOut, 
-  LayoutDashboard, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  ChevronDown, 
-  Loader2,
-  Bell,
-  CreditCard
+    LayoutDashboard, Users, Settings, CreditCard, 
+    Video, Radio, MessageSquare, CheckSquare, 
+    Plus, Search, Bell, ChevronRight, Play, Mic, Monitor, LogOut
 } from 'lucide-react';
 
-/**
- * Home Component (The main SaaS Dashboard):
- * 1. Checks if user has a workspace.
- * 2. Redirects to /create-workspace if no workspace found.
- * 3. Displays analytics for the active workspace.
- * 4. Listens for real-time events via Socket.io.
- */
 const Home = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
-    // Auth state
     const { user } = useSelector((state) => state.auth);
-    
-    // Workspace state
     const { list, activeWorkspace, loading } = useSelector((state) => state.workspaces);
+    const [isStreaming, setIsStreaming] = useState(false);
 
-    // Initial load: Fetch all workspaces
     useEffect(() => {
         dispatch(fetchWorkspaces());
     }, [dispatch]);
 
-    // Multi-tenancy check
     useEffect(() => {
         if (!loading && list.length === 0) {
             navigate('/create-workspace');
         }
     }, [list, loading, navigate]);
 
-    // Initialize Real-time Socket Connection
     const socket = useSocket(activeWorkspace?._id);
 
-    // Listen for real-time notifications
     useEffect(() => {
         if (!socket) return;
-
         socket.on('notification', (payload) => {
             toast.success(payload.message, {
               icon: '🚀',
-              style: {
-                borderRadius: '10px', background: '#1e293b', color: '#fff', border: '1px solid #334155'
-              },
+              style: { borderRadius: '15px', background: '#fff', color: '#0f172a', border: '1px solid #e2e8f0', fontWeight: 'bold' },
             });
         });
-
-        return () => {
-            socket.off('notification');
-        };
+        return () => socket.off('notification');
     }, [socket]);
 
-    if (loading && !activeWorkspace) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-slate-950">
-                <Loader2 className="animate-spin text-blue-500" size={40} />
-            </div>
-        );
-    }
-
     return (
-        <div className="flex h-screen bg-[#020617] text-slate-200 overflow-hidden font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen flex bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-600">
             <Toaster position="top-right" />
-
-            {/* Background Ambient Glows */}
-            <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
-
+            
             {/* Sidebar */}
-            <aside className="w-72 glass-sidebar flex flex-col relative z-20">
-                <div className="p-6">
-                    <div className="flex items-center gap-3 mb-10 group cursor-pointer">
-                        <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
-                            <LayoutDashboard size={20} className="text-white" />
-                        </div>
-                        <span className="font-black text-2xl text-white tracking-tighter group-hover:text-blue-400 transition-colors">SaaSify</span>
+            <aside className="w-72 uplifter-sidebar flex flex-col p-6 sticky top-0 h-screen overflow-y-auto">
+                <div className="flex items-center gap-3 px-4 mb-12 group">
+                    <div className="h-10 w-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30 group-hover:scale-110 transition-transform">
+                        <LayoutDashboard size={24} className="text-white" />
                     </div>
-                    
-                    {/* Workspace Switcher */}
-                    <div className="mb-8">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[2px] mb-3 ml-2">Workspaces</p>
-                        <button className="flex w-full items-center justify-between gap-3 px-3 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group active:scale-95">
-                            <div className="flex items-center gap-3 overflow-hidden text-left font-bold">
-                                <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-slate-700 to-slate-800 flex items-center justify-center text-xs font-black text-white shrink-0 group-hover:from-blue-600 group-hover:to-indigo-600 transition-all shadow-inner">
-                                    {activeWorkspace?.name?.charAt(0).toUpperCase() || 'W'}
-                                </div>
-                                <span className="font-semibold text-sm text-slate-200 truncate">{activeWorkspace?.name || 'Loading...'}</span>
-                            </div>
-                            <ChevronDown size={14} className="text-slate-500 group-hover:text-blue-400" />
-                        </button>
-                    </div>
-
-                    <nav className="space-y-1">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[2px] mb-3 ml-2">Menu</p>
-                        <Link to="/dashboard" className="discord-sidebar-item-active">
-                            <BarChart3 size={18} />
-                            Dashboard
-                        </Link>
-                        <Link to="/team" className="discord-sidebar-item">
-                            <Users size={18} />
-                            Team
-                        </Link>
-                        <Link to="/billing" className="discord-sidebar-item">
-                            <CreditCard size={18} />
-                            Billing
-                        </Link>
-                        <Link to="/settings" className="discord-sidebar-item">
-                            <Settings size={18} />
-                            Settings
-                        </Link>
-                    </nav>
+                    <span className="font-black text-2xl tracking-tighter text-slate-900 italic">SaaSify</span>
                 </div>
-                
-                <div className="mt-auto p-4 border-t border-white/5 bg-black/20">
-                    <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 transition-all cursor-pointer group">
-                        <div className="relative">
-                            <div className="h-10 w-10 rounded-xl bg-slate-800 overflow-hidden flex items-center justify-center text-sm font-black text-slate-300 ring-2 ring-white/5 group-hover:ring-blue-500/50 transition-all shadow-md">
-                                {user?.name?.charAt(0)}
-                            </div>
-                            <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-[#12161b]"></div>
+
+                <nav className="space-y-1 flex-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-4">Workspace</p>
+                    <Link to="/dashboard" className="sidebar-item-light sidebar-item-light-active">
+                        <LayoutDashboard size={20} />
+                        Dashboard
+                    </Link>
+                    <Link to="/team" className="sidebar-item-light">
+                        <Users size={20} />
+                        Team Space
+                    </Link>
+                    <Link to="/settings" className="sidebar-item-light">
+                        <Settings size={20} />
+                        Settings
+                    </Link>
+                    <Link to="/billing" className="sidebar-item-light">
+                        <CreditCard size={20} />
+                        Billing
+                    </Link>
+
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-12 mb-4 ml-4">Live Hub</p>
+                    <div className="sidebar-item-light">
+                        <Video size={20} />
+                        Meeting Room
+                        <span className="tag-pill tag-blue ml-auto">Free</span>
+                    </div>
+                    <div className="sidebar-item-light">
+                        <Radio size={20} />
+                        Live Stream
+                    </div>
+                </nav>
+
+                <div className="mt-auto pt-8 border-t border-slate-200">
+                    <div className="p-4 flex items-center gap-3 bg-white rounded-3xl border border-slate-200 shadow-sm mb-4">
+                        <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-600">
+                            {user?.name?.charAt(0)}
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-bold text-white truncate">{user?.name || 'User Name'}</p>
-                            <p className="text-[10px] text-slate-500 truncate uppercase tracking-tight opacity-70">{user?.email || 'user@example.com'}</p>
+                            <p className="text-sm font-bold text-slate-800 leading-none truncate">{user?.name}</p>
+                            <button 
+                                onClick={() => dispatch(logout())}
+                                className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1 hover:text-red-700 transition-colors"
+                            >
+                                <LogOut size={10} /> Logout
+                            </button>
                         </div>
                     </div>
-                    <button 
-                        onClick={() => dispatch(logout())}
-                        className="flex w-full items-center gap-2 mt-4 px-3 py-2.5 rounded-lg text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-all text-xs font-bold uppercase tracking-widest"
-                    >
-                        <LogOut size={16} />
-                        Sign out
-                    </button>
                 </div>
             </aside>
 
-            {/* Main Content Area */}
-            <main className="flex-1 overflow-auto bg-[#020617] relative z-10 scrollbar-hide">
-                <header className="h-20 glass-nav flex items-center justify-between px-10 sticky top-0 z-30">
+            {/* Main Content */}
+            <main className="flex-1 p-10 pb-24 max-w-[1600px]">
+                {/* Header */}
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                     <div>
-                      <p className="text-[10px] text-blue-400 uppercase tracking-[3px] font-black mb-1">Live Environment</p>
-                      <h2 className="text-xl font-black text-white tracking-tight">Dashboard</h2>
+                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[4px] mb-2">{activeWorkspace?.name || 'Workspace'}</p>
+                        <h1 className="text-4xl font-black tracking-tighter text-slate-900">
+                           Dashboard <span className="text-blue-600">.</span>
+                        </h1>
                     </div>
-                    <div className="flex items-center gap-5">
-                        <Link 
-                            to="/billing"
-                            className="px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 text-[10px] font-black border border-blue-500/20 uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95"
-                        >
-                            {activeWorkspace?.subscription?.plan || 'Free'} Plan
-                        </Link>
-                        <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer relative border border-white/5">
-                          <Bell size={20} />
-                          <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-blue-500 ring-2 ring-[#020617]"></div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="relative hidden xl:block">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Search workspace..." 
+                                className="bg-white border border-slate-200 rounded-2xl py-3 pl-12 pr-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 w-64 transition-all shadow-sm"
+                            />
                         </div>
+                        <button className="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors relative shadow-sm">
+                            <Bell size={20} />
+                            <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-blue-500 border-2 border-white"></span>
+                        </button>
+                        <button className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold hover:shadow-lg hover:shadow-blue-600/30 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
+                            <Plus size={20} />
+                            New Project
+                        </button>
                     </div>
                 </header>
 
-                <div className="p-10 max-w-[1600px] mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-                        {[
-                            { label: 'Total Revenue', value: '$24,560', change: '+12.5%', icon: BarChart3, color: 'text-emerald-400', glow: 'shadow-emerald-500/10' },
-                            { label: 'Active Users', value: '1,234', change: '+18.2%', icon: Users, color: 'text-blue-400', glow: 'shadow-blue-500/10' },
-                            { label: 'Live Members', value: activeWorkspace?.members?.length || '1', change: 'Online', icon: LayoutDashboard, color: 'text-purple-400', glow: 'shadow-purple-500/10' },
-                        ].map((stat, i) => (
-                            <div key={i} className={`p-8 rounded-[2rem] glass-card hover:translate-y-[-4px] transition-all duration-300 group ${stat.glow}`}>
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className={`p-3 rounded-2xl bg-[#0f172a] border border-white/5 group-hover:scale-110 transition-all ${stat.color}`}>
-                                        <stat.icon size={24} />
+                {/* Grid */}
+                <div className="grid grid-cols-12 gap-8">
+                    
+                    {/* Live Meeting / Huddle Card */}
+                    <section className="col-span-12 lg:col-span-8 uplifter-card relative overflow-hidden group min-h-[450px]">
+                        <div className="absolute top-8 left-8 z-20 flex items-center gap-3">
+                            <span className="tag-pill tag-red animate-pulse flex items-center gap-1.5 shadow-xl">
+                                <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+                                Live Meeting
+                            </span>
+                            <span className="tag-pill tag-blue">HQ Room</span>
+                        </div>
+                        
+                        <div className="relative h-full flex flex-col justify-end">
+                            {/* Video Placeholder Background */}
+                            <div className="absolute inset-0 bg-slate-100 overflow-hidden">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2070&auto=format&fit=crop" 
+                                    alt="Meeting" 
+                                    className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-[2s]"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
+                            </div>
+
+                            <div className="relative z-10 p-10 flex items-end justify-between">
+                                <div className="space-y-4">
+                                    <div className="flex -space-x-3">
+                                        {[1,2,3].map(i => (
+                                            <div key={i} className="h-12 w-12 rounded-full border-4 border-white overflow-hidden shadow-xl">
+                                                <img src={`/portrait_${i}.png`} className="w-full h-full object-cover" alt="" />
+                                            </div>
+                                        ))}
+                                        <div className="h-12 w-12 rounded-full border-4 border-white bg-slate-900 flex items-center justify-center text-xs font-black text-white shadow-xl">+8</div>
                                     </div>
-                                    <span className={`text-[10px] font-black uppercase tracking-[2px] bg-white/5 px-3 py-1.5 rounded-full ${stat.color} border border-white/5`}>
-                                      {stat.change}
-                                    </span>
+                                    <h3 className="text-white text-3xl font-black tracking-tighter">Strategic Q3 Planning</h3>
+                                    <div className="flex items-center gap-4">
+                                        <span className="text-white/70 text-sm font-medium flex items-center gap-2">
+                                            <Mic size={14} className="text-blue-400" /> Mike, Sarah, and 4 others speaking
+                                        </span>
+                                    </div>
                                 </div>
-                                <p className="text-xs font-black uppercase tracking-[2.5px] text-slate-500 mb-2">{stat.label}</p>
-                                <p className="text-4xl font-black text-white tracking-tighter">{stat.value}</p>
+                                <button className="bg-blue-600 text-white px-10 py-5 rounded-[2rem] font-black shadow-2xl hover:bg-blue-500 hover:scale-105 transition-all text-sm uppercase tracking-widest">
+                                    Join Huddle
+                                </button>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    </section>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="rounded-[2.5rem] glass-card p-10 overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[80px] rounded-full pointer-events-none"></div>
-                            <div className="flex items-center justify-between mb-10">
-                                <div>
-                                    <h3 className="text-xl font-black text-white tracking-tight">Revenue Trend</h3>
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-[2px] font-black mt-1">Global performance</p>
-                                </div>
-                                <select className="bg-white/5 border border-white/5 text-[10px] uppercase font-black text-slate-400 rounded-xl px-4 py-2 outline-none hover:bg-white/10 transition-all cursor-pointer">
-                                  <option>Last 7 Days</option>
-                                  <option>Last 30 Days</option>
-                                </select>
+                    {/* Team Broadcast / Streaming Side Card */}
+                    <section className="col-span-12 lg:col-span-4 space-y-8">
+                        <div className="uplifter-card p-10 flex flex-col h-full bg-white relative overflow-hidden">
+                            <div className="flex items-center justify-between mb-8">
+                                <h4 className="text-slate-900 font-black text-xl tracking-tighter italic">Live Stream</h4>
+                                <div className={`h-2 w-2 rounded-full ${isStreaming ? 'bg-red-500 animate-ping' : 'bg-slate-300'}`}></div>
                             </div>
-                            <div className="h-[350px] w-full">
-                                <RevenueChart />
+                            
+                            <div className="aspect-square rounded-[2rem] bg-slate-100 mb-8 flex items-center justify-center relative overflow-hidden border border-slate-200">
+                                {isStreaming ? (
+                                    <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-white">
+                                        <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                                            <Radio size={24} />
+                                        </div>
+                                        <p className="font-black uppercase tracking-widest text-[10px]">Broadcasting Live</p>
+                                    </div>
+                                ) : (
+                                    <div className="text-center p-8">
+                                        <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl text-slate-300">
+                                            <Monitor size={32} />
+                                        </div>
+                                        <p className="text-slate-400 font-bold text-sm">Ready to share your screen?</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <button 
+                                onClick={() => setIsStreaming(!isStreaming)}
+                                className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${isStreaming ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-slate-950 text-white hover:bg-slate-800 shadow-xl'}`}
+                            >
+                                {isStreaming ? 'Stop Broadcast' : 'Start Streaming'}
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* Task Board Section */}
+                    <section className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="uplifter-card p-10">
+                            <div className="flex items-center justify-between mb-8">
+                                <h4 className="font-black text-xl tracking-tighter">Current Tasks</h4>
+                                <Plus size={20} className="text-slate-400 cursor-pointer hover:text-blue-500" />
+                            </div>
+                            <div className="space-y-4">
+                                {[
+                                    { t: "Deploy billing module", p: "Critical", c: "red" },
+                                    { t: "Style workspace grid", p: "Normal", c: "blue" },
+                                    { t: "Team onboarding", p: "High", c: "purple" },
+                                ].map((task, i) => (
+                                    <div key={i} className="flex flex-col gap-3 p-5 bg-slate-100/50 rounded-3xl border border-transparent hover:border-slate-200 hover:bg-white transition-all cursor-pointer group">
+                                        <span className={`tag-pill tag-${task.c} w-max`}>{task.p}</span>
+                                        <p className="font-bold text-slate-800 text-sm group-hover:text-blue-600">{task.t}</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
-                        <div className="rounded-[2.5rem] glass-card p-10 overflow-hidden relative">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 blur-[80px] rounded-full pointer-events-none"></div>
-                            <div className="flex items-center justify-between mb-10">
-                                <div>
-                                    <h3 className="text-xl font-black text-white tracking-tight">User Engagement</h3>
-                                    <p className="text-[10px] text-slate-500 uppercase tracking-[2px] font-black mt-1">Daily activities</p>
-                                </div>
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                  <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Live</span>
-                                </div>
+                        <div className="col-span-1 md:col-span-2 uplifter-card p-10 bg-slate-900 text-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-10">
+                                <Users size={120} className="text-white/5 rotate-[15deg]" />
                             </div>
-                            <div className="h-[350px] w-full">
-                                <UserGrowthChart />
+                            <h4 className="text-2xl font-black tracking-tighter mb-10 relative z-10 italic">Team Presence</h4>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 relative z-10">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="flex flex-col items-center gap-4">
+                                        <div className="h-16 w-16 rounded-[1.25rem] bg-white p-1 relative overflow-hidden group">
+                                            <img src={`/portrait_${i}.png`} className="w-full h-full object-cover rounded-xl group-hover:scale-110 transition-transform" alt="" />
+                                            <div className="absolute bottom-1 right-1 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full"></div>
+                                        </div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Active</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </main>
         </div>
