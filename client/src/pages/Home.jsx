@@ -44,107 +44,134 @@ const Home = () => {
     }, [socket]);
 
     return (
-        <div className="min-h-screen flex bg-slate-50 font-sans selection:bg-blue-100 selection:text-blue-600">
+        <div className="min-h-screen bg-[#050505] text-slate-300 font-sans selection:bg-blue-500/30">
             <Toaster position="top-right" />
             
-            {/* Sidebar */}
-            <aside className="w-72 uplifter-sidebar flex flex-col p-6 sticky top-0 h-screen overflow-y-auto">
-                <div className="flex items-center gap-3 px-4 mb-12 group">
-                    <div className="h-10 w-10 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/30 group-hover:scale-110 transition-transform">
-                        <LayoutDashboard size={24} className="text-white" />
+            {/* Background Gradients */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/5 blur-[120px] rounded-full"></div>
+                <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-600/5 blur-[120px] rounded-full"></div>
+            </div>
+
+            {/* Top Navbar */}
+            <nav className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/5 px-8 h-20 flex items-center justify-between">
+                <div className="flex items-center gap-12">
+                    <div className="flex items-center gap-3 group cursor-pointer">
+                        <div className="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
+                            <LayoutDashboard size={20} className="text-white" />
+                        </div>
+                        <span className="font-black text-xl tracking-tighter text-white italic">SaaSify</span>
                     </div>
-                    <span className="font-black text-2xl tracking-tighter text-slate-900 italic">SaaSify</span>
-                </div>
 
-                <nav className="space-y-1 flex-1">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-4">Workspace</p>
-                    <Link to="/dashboard" className="sidebar-item-light sidebar-item-light-active">
-                        <LayoutDashboard size={20} />
-                        Dashboard
-                    </Link>
-                    <Link to="/team" className="sidebar-item-light">
-                        <Users size={20} />
-                        Team Space
-                    </Link>
-                    <Link to="/settings" className="sidebar-item-light">
-                        <Settings size={20} />
-                        Settings
-                    </Link>
-                    <Link to="/billing" className="sidebar-item-light">
-                        <CreditCard size={20} />
-                        Billing
-                    </Link>
-
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-12 mb-4 ml-4">Live Hub</p>
-                    <Link to="/meeting" className="sidebar-item-light">
-                        <Video size={20} />
-                        Meeting Room
-                        <span className="tag-pill tag-blue ml-auto">Live</span>
-                    </Link>
-
-                </nav>
-
-                <div className="mt-auto pt-8 border-t border-slate-200">
-                    <div className="p-4 flex items-center gap-3 bg-white rounded-3xl border border-slate-200 shadow-sm mb-4">
-                        <div className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-600">
-                            {user?.name?.charAt(0)}
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-bold text-slate-800 leading-none truncate">{user?.name}</p>
-                            <button 
-                                onClick={() => dispatch(logout())}
-                                className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1 hover:text-red-700 transition-colors"
-                            >
-                                <LogOut size={10} /> Logout
-                            </button>
-                        </div>
+                    <div className="hidden md:flex items-center gap-1">
+                        <Link to="/dashboard" className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-white/10 transition-all">Dashboard</Link>
+                        <Link to="/team" className="px-4 py-2 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Team</Link>
+                        <Link to="/settings" className="px-4 py-2 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Settings</Link>
+                        <Link to="/billing" className="px-4 py-2 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all">Billing</Link>
+                        <div className="h-4 w-px bg-white/10 mx-2"></div>
+                        <Link to="/meeting" className="px-4 py-2 rounded-xl text-sm font-bold text-blue-400 hover:bg-blue-500/10 transition-all flex items-center gap-2">
+                            <Video size={16} /> Meeting Room
+                        </Link>
                     </div>
                 </div>
-            </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 p-10 pb-24 max-w-[1600px]">
-                {/* Header */}
-                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-                    <div>
-                        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[4px] mb-2">{activeWorkspace?.name || 'Workspace'}</p>
-                        <h1 className="text-4xl font-black tracking-tighter text-slate-900">
-                           Dashboard <span className="text-blue-600">.</span>
-                        </h1>
+                <div className="flex items-center gap-6">
+                    <div className="relative hidden lg:block">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                        <input 
+                            type="text" 
+                            placeholder="Search..." 
+                            className="bg-white/5 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs text-white focus:outline-none focus:border-blue-500/50 w-48 transition-all"
+                        />
                     </div>
+                    <button className="relative text-slate-400 hover:text-white transition-colors">
+                        <Bell size={20} />
+                        <span className="absolute -top-1 -right-1 h-2 w-2 bg-blue-600 rounded-full border-2 border-black"></span>
+                    </button>
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-[10px] font-black text-white border border-white/10 cursor-pointer hover:scale-105 transition-transform">
+                        {user?.name?.charAt(0)}
+                    </div>
+                </div>
+            </nav>
 
-                    <div className="flex items-center gap-4">
-                        <div className="relative hidden xl:block">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <input 
-                                type="text" 
-                                placeholder="Search workspace..." 
-                                className="bg-white border border-slate-200 rounded-2xl py-3 pl-12 pr-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/10 w-64 transition-all shadow-sm"
-                            />
+            <main className="relative z-10 max-w-7xl mx-auto p-10">
+                {/* Header Section */}
+                <header className="mb-16">
+                    <div className="flex items-center gap-2 mb-3">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[4px]">{activeWorkspace?.name || 'Workspace active'}</p>
+                    </div>
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                        <div>
+                            <h1 className="text-5xl font-black text-white tracking-tighter italic mb-4">
+                                Experience <span className="text-blue-600">Space .</span>
+                            </h1>
+                            <p className="text-slate-500 font-medium max-w-xl">
+                                Select your workspace mode to start collaborating with your team in high-fidelity virtual environments.
+                            </p>
                         </div>
-                        <button className="h-12 w-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors relative shadow-sm">
-                            <Bell size={20} />
-                            <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-blue-500 border-2 border-white"></span>
-                        </button>
-                        <button className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold hover:shadow-lg hover:shadow-blue-600/30 transition-all active:scale-95 shadow-lg shadow-blue-500/20">
-                            <Plus size={20} />
-                            New Project
+                        <button className="flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-500 hover:shadow-2xl hover:shadow-blue-600/40 transition-all active:scale-95 shadow-xl shadow-blue-600/20">
+                            <Plus size={18} /> New Environment
                         </button>
                     </div>
                 </header>
 
-                {/* Grid */}
+                {/* Workspace Modes Selection */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20">
+                    {/* Office Mode */}
+                    <div className="group relative bg-white/5 border border-white/5 rounded-[3rem] p-8 hover:bg-white/10 transition-all duration-500 overflow-hidden">
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px] group-hover:bg-blue-600/20 transition-all"></div>
+                        <div className="h-64 rounded-[2rem] bg-slate-800 mb-8 overflow-hidden relative">
+                            <img src="/office_preview.jpg" className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" alt="Office" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
+                            <div className="absolute bottom-6 left-6 px-4 py-2 bg-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg">Beta 2.0</div>
+                        </div>
+                        <div className="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 className="text-2xl font-black text-white tracking-tight mb-2 italic">Virtual Office Space</h3>
+                                <p className="text-sm text-slate-500 leading-relaxed max-w-xs">The newest version of Workspace, best for remote teams working together every day in a virtual office.</p>
+                            </div>
+                            <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <LayoutDashboard size={24} />
+                            </div>
+                        </div>
+                        <button className="mt-8 w-full py-4 rounded-2xl bg-white text-black font-black text-[10px] uppercase tracking-[2px] hover:bg-blue-600 hover:text-white transition-all shadow-xl">
+                            Enter Office Mode
+                        </button>
+                    </div>
+
+                    {/* Event Mode */}
+                    <div className="group relative bg-white/5 border border-white/5 rounded-[3rem] p-8 hover:bg-white/10 transition-all duration-500 overflow-hidden">
+                        <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-600/10 rounded-full blur-[80px] group-hover:bg-purple-600/20 transition-all"></div>
+                        <div className="h-64 rounded-[2rem] bg-slate-800 mb-8 overflow-hidden relative">
+                            <img src="/event_preview.jpg" className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" alt="Event" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
+                            <div className="absolute bottom-6 left-6 px-4 py-2 bg-purple-600 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg">Events 1.0</div>
+                        </div>
+                        <div className="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 className="text-2xl font-black text-white tracking-tight mb-2 italic">Digital Congress Center</h3>
+                                <p className="text-sm text-slate-500 leading-relaxed max-w-xs">The classic version with event templates. Best for virtual conferences and one-time gatherings.</p>
+                            </div>
+                            <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-all">
+                                <Video size={24} />
+                            </div>
+                        </div>
+                        <button className="mt-8 w-full py-4 rounded-2xl bg-white text-black font-black text-[10px] uppercase tracking-[2px] hover:bg-purple-600 hover:text-white transition-all shadow-xl">
+                            Enter Event Mode
+                        </button>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-12 gap-8">
-                    
-
-
                     {/* Progress & Efficiency Section */}
-                    <section className="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                        {/* Module Progress */}
-                        <div className="uplifter-card p-10">
-                            <div className="flex items-center justify-between mb-8">
-                                <h4 className="font-black text-xl tracking-tighter italic">Module Progress</h4>
-                                <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">View all</button>
+                    <div className="col-span-12 lg:col-span-6">
+                        <div className="bg-white/5 border border-white/5 rounded-[3rem] p-10 hover:bg-white/[0.07] transition-all">
+                            <div className="flex items-center justify-between mb-10">
+                                <h4 className="font-black text-xl tracking-tighter italic text-white">Module Progress</h4>
+                                <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-500">
+                                    <CheckSquare size={18} />
+                                </div>
                             </div>
                             <div className="space-y-8">
                                 {[
@@ -152,14 +179,13 @@ const Home = () => {
                                     { name: "Dashboard UI", progress: 68, color: "bg-blue-600" },
                                     { name: "Billing module", progress: 42, color: "bg-amber-500" },
                                     { name: "Testing suite", progress: 22, color: "bg-rose-500" },
-                                    { name: "API docs", progress: 80, color: "bg-indigo-500" },
                                 ].map((item, i) => (
                                     <div key={i} className="group">
                                         <div className="flex justify-between items-end mb-3">
-                                            <span className="text-sm font-bold text-slate-700 tracking-tight">{item.name}</span>
-                                            <span className="text-xs font-black text-slate-900 italic">{item.progress}%</span>
+                                            <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">{item.name}</span>
+                                            <span className="text-sm font-black text-white italic">{item.progress}%</span>
                                         </div>
-                                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                                             <div 
                                                 className={`h-full ${item.color} rounded-full group-hover:scale-x-105 transition-transform origin-left`} 
                                                 style={{ width: `${item.progress}%` }}
@@ -168,71 +194,26 @@ const Home = () => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-12 pt-8 border-t border-slate-100 flex justify-between items-center">
-                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest italic font-bold">Overall sprint health</span>
-                                <span className="text-xl font-black text-emerald-500 italic">74%</span>
-                            </div>
                         </div>
+                    </div>
 
-                        {/* Completed - Efficiency */}
-                        <div className="uplifter-card p-10">
-                            <div className="flex items-center justify-between mb-8">
-                                <h4 className="font-black text-xl tracking-tighter italic">Completed — efficiency</h4>
-                                <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">History</button>
-                            </div>
-                            <div className="space-y-6">
-                                {[
-                                    { name: "MongoDB schemas", efficiency: 98, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                                    { name: "JWT auth middleware", efficiency: 95, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                                    { name: "Cloudinary setup", efficiency: 91, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                                    { name: "Redis sessions", efficiency: 72, color: "text-amber-500", bg: "bg-amber-500/10" },
-                                    { name: "Rate limiter", efficiency: 55, color: "text-rose-500", bg: "bg-rose-500/10" },
-                                ].map((item, i) => (
-                                    <div key={i} className="flex items-center justify-between group cursor-default">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                                                <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
-                                            </div>
-                                            <span className="text-sm font-bold text-slate-400 line-through tracking-tight group-hover:text-slate-600 transition-colors">{item.name}</span>
-                                        </div>
-                                        <span className={`px-2 py-0.5 rounded-md ${item.bg} ${item.color} text-[10px] font-black italic`}>
-                                            {item.efficiency}%
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mt-12 h-32 w-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 flex items-center justify-between relative overflow-hidden group shadow-xl shadow-blue-600/20">
-                                <Users className="absolute -bottom-4 -right-4 text-white/5 group-hover:scale-110 transition-transform" size={100} />
-                                <div className="relative z-10">
-                                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1 italic">Weekly Goal</p>
-                                    <h5 className="text-white font-black text-xl italic">86% Achieved</h5>
-                                </div>
-                                <ArrowRight className="relative z-10 text-white group-hover:translate-x-2 transition-transform" />
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Task Board Section */}
-                    <section className="col-span-12">
-                        <div className="uplifter-card p-10 max-w-4xl">
-                            <div className="flex items-center justify-between mb-8">
-                                <h4 className="font-black text-xl tracking-tighter">Current Tasks</h4>
-                                <Plus size={20} className="text-slate-400 cursor-pointer hover:text-blue-500" />
-                            </div>
+                    <div className="col-span-12 lg:col-span-6">
+                        <div className="bg-white/5 border border-white/5 rounded-[3rem] p-10 h-full">
+                            <h4 className="font-black text-xl tracking-tighter italic text-white mb-10">Current Tasks</h4>
                             <div className="space-y-4">
                                 {[
-                                    { t: "Deploy billing module", p: "Critical", c: "red" },
-                                    { t: "Style workspace grid", p: "Normal", c: "blue" },
-                                    { t: "Team onboarding", p: "High", c: "purple" },
+                                    { t: "Deploy billing module", p: "Critical", c: "bg-rose-500" },
+                                    { t: "Style workspace grid", p: "Normal", c: "bg-blue-600" },
+                                    { t: "Team onboarding", p: "High", c: "bg-purple-600" },
                                 ].map((task, i) => (
-                                    <div key={i} className="flex flex-col gap-3 p-5 bg-slate-100/50 rounded-3xl border border-transparent hover:border-slate-200 hover:bg-white transition-all cursor-pointer group">
-                                        <span className={`tag-pill tag-${task.c} w-max`}>{task.p}</span>
-                                        <p className="font-bold text-slate-800 text-sm group-hover:text-blue-600">{task.t}</p>
+                                    <div key={i} className="flex items-center justify-between p-5 bg-white/5 border border-white/5 rounded-3xl hover:bg-white/10 transition-all cursor-pointer">
+                                        <p className="font-bold text-slate-300 text-sm italic">{task.t}</p>
+                                        <span className={`px-2 py-0.5 rounded-lg ${task.c} text-[8px] font-black uppercase text-white tracking-widest`}>{task.p}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    </section>
+                    </div>
                 </div>
             </main>
         </div>
