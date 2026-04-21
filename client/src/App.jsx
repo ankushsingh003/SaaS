@@ -6,7 +6,7 @@ import Home from './pages/Home';
 import MeetingRoom from './pages/MeetingRoom';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Billing from './pages/Billing';
+import Pricing from './pages/Pricing';
 import CreateWorkspace from './pages/CreateWorkspace';
 import Join from './pages/Join';
 import ProtectedRoute from './components/ProtectedRoute';
