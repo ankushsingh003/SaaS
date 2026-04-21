@@ -63,14 +63,16 @@ export const sendInvitationEmail = async (email, workspaceName, inviterName, inv
 
     try {
         const info = await currentTransporter.sendMail(mailOptions);
-        console.log('Message sent: %s', info.messageId);
-        // If using ethereal, log the preview URL
+        console.log('--- Email Sent Successfully ---');
+        console.log('ID:', info.messageId);
+        
         if (process.env.SMTP_HOST === 'smtp.ethereal.email' || !process.env.SMTP_HOST) {
-            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
         }
         return true;
     } catch (error) {
-        console.error('Error sending email:', error);
-        return false;
+        console.error('--- Email Delivery Failed ---');
+        console.error(error);
+        throw new Error(`Email delivery failed: ${error.message}`);
     }
 };
