@@ -163,57 +163,6 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-12 gap-8">
-                    {/* Progress & Efficiency Section */}
-                    <div className="col-span-12 lg:col-span-6">
-                        <div className="bg-white/5 border border-white/5 rounded-[3rem] p-10 hover:bg-white/[0.07] transition-all">
-                            <div className="flex items-center justify-between mb-10">
-                                <h4 className="font-black text-xl tracking-tighter italic text-white">Module Progress</h4>
-                                <div className="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-500">
-                                    <CheckSquare size={18} />
-                                </div>
-                            </div>
-                            <div className="space-y-8">
-                                {[
-                                    { name: "Auth module", progress: 95, color: "bg-emerald-500" },
-                                    { name: "Dashboard UI", progress: 68, color: "bg-blue-600" },
-                                    { name: "Billing module", progress: 42, color: "bg-amber-500" },
-                                    { name: "Testing suite", progress: 22, color: "bg-rose-500" },
-                                ].map((item, i) => (
-                                    <div key={i} className="group">
-                                        <div className="flex justify-between items-end mb-3">
-                                            <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">{item.name}</span>
-                                            <span className="text-sm font-black text-white italic">{item.progress}%</span>
-                                        </div>
-                                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                                            <div 
-                                                className={`h-full ${item.color} rounded-full group-hover:scale-x-105 transition-transform origin-left`} 
-                                                style={{ width: `${item.progress}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="col-span-12 lg:col-span-6">
-                        <div className="bg-white/5 border border-white/5 rounded-[3rem] p-10 h-full">
-                            <h4 className="font-black text-xl tracking-tighter italic text-white mb-10">Current Tasks</h4>
-                            <div className="space-y-4">
-                                {[
-                                    { t: "Deploy billing module", p: "Critical", c: "bg-rose-500" },
-                                    { t: "Style workspace grid", p: "Normal", c: "bg-blue-600" },
-                                    { t: "Team onboarding", p: "High", c: "bg-purple-600" },
-                                ].map((task, i) => (
-                                    <div key={i} className="flex items-center justify-between p-5 bg-white/5 border border-white/5 rounded-3xl hover:bg-white/10 transition-all cursor-pointer">
-                                        <p className="font-bold text-slate-300 text-sm italic">{task.t}</p>
-                                        <span className={`px-2 py-0.5 rounded-lg ${task.c} text-[8px] font-black uppercase text-white tracking-widest`}>{task.p}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </main>
         </div>
