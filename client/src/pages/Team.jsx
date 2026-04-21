@@ -15,7 +15,8 @@ import {
   Copy,
   Check,
   Trash2,
-  ExternalLink
+  ExternalLink,
+  Filter
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
