@@ -81,12 +81,26 @@ export const addMember = async (workspaceId, email, role = 'member', inviterId) 
         return { user, status: 'added' };
     }
 
-    // 2. If user doesn't exist, create a pending invitation
+    // 2. If user doesn't exist, create/resend a pending invitation
     const token = crypto.randomBytes(32).toString('hex');
     
-    // Check if there's already a pending invite for this email in this workspace
-    const existingInvite = await Invitation.findOne({ email: email.toLowerCase(), workspace: workspaceId, status: 'pending' });
-    if (existingInvite) throw new Error('Invitation already sent to this email');
+    // Check for existing pending invite
+    const existingInvite = await Invitation.findOne({ 
+        email: email.toLowerCase(), 
+        workspace: workspaceId, 
+        status: 'pending' 
+    }).sort({ createdAt: -1 });
+
+    if (existingInvite) {
+        // Rate limit: check if last invite was less than 10 seconds ago
+        const timeDiff = (new Date() - existingInvite.createdAt) / 1000;
+        if (timeDiff < 10) {
+            throw new Error(`Please wait ${Math.ceil(10 - timeDiff)} seconds before resending to this email.`);
+        }
+        // Mark old one as "expired" or just keep it and create a new one
+        existingInvite.status = 'expired';
+        await existingInvite.save();
+    }
 
     const invitation = await Invitation.create({
         email: email.toLowerCase(),
