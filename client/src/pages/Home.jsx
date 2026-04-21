@@ -164,9 +164,6 @@ const Home = () => {
                 </div>
             </main>
         </div>
-
-            </main>
-        </div>
     );
 };
 
