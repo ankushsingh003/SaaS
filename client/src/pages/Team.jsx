@@ -10,20 +10,24 @@ import {
   MoreVertical, 
   Loader2, 
   Search,
-  ArrowLeft
+  ArrowLeft,
+  Link as LinkIcon,
+  Copy,
+  Check,
+  Trash2,
+  ExternalLink
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-/**
- * Team Management Page:
- * Allows owners/admins to view members and invite new ones.
- */
 const Team = () => {
     const { activeWorkspace } = useSelector((state) => state.workspaces);
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [inviteEmail, setInviteEmail] = useState('');
+    const [bulkEmails, setBulkEmails] = useState('');
     const [inviting, setInviting] = useState(false);
+    const [inviteMode, setInviteMode] = useState('single'); // single, bulk, link
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         if (activeWorkspace?._id) {
@@ -45,166 +49,279 @@ const Team = () => {
 
     const handleInvite = async (e) => {
         e.preventDefault();
-        if (!inviteEmail) return;
+        const emailsToInvite = inviteMode === 'single' 
+            ? [inviteEmail.trim()] 
+            : bulkEmails.split(/[\s,]+/).filter(e => e.includes('@'));
+
+        if (emailsToInvite.length === 0) return;
 
         try {
             setInviting(true);
-            await api.post(`/workspaces/${activeWorkspace._id}/invite`, {
-                email: inviteEmail,
-                role: 'member'
-            });
-            toast.success('Member added successfully!');
+            // In a real scenario, the backend would handle an array or we'd loop.
+            // For now, let's keep the existing single endpoint but prepare for multi.
+            for (const email of emailsToInvite) {
+                await api.post(`/workspaces/${activeWorkspace._id}/invite`, {
+                    email,
+                    role: 'member'
+                });
+            }
+            
+            toast.success(emailsToInvite.length > 1 ? `Invited ${emailsToInvite.length} members!` : 'Invitation sent!');
             setInviteEmail('');
-            fetchMembers(); // Refresh list
+            setBulkEmails('');
+            fetchMembers();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to invite member');
+            toast.error(error.response?.data?.message || 'Failed to invite members');
         } finally {
             setInviting(false);
         }
     };
 
+    const copyInviteLink = () => {
+        const link = `${window.location.origin}/join/${activeWorkspace?._id}`;
+        navigator.clipboard.writeText(link);
+        setCopied(true);
+        toast.success('Invite link copied!');
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
+        <div className="min-h-screen bg-[#050505] text-slate-300 font-sans selection:bg-blue-500/30">
             <Toaster position="top-right" />
             
-            <div className="max-w-5xl mx-auto">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <Link to="/dashboard" className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all">
-                            <ArrowLeft size={20} />
+            {/* Background Gradients */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full"></div>
+                <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full"></div>
+            </div>
+
+            <div className="relative z-10 max-w-6xl mx-auto p-6 lg:p-10">
+                {/* Header Section */}
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+                    <div className="flex items-center gap-6">
+                        <Link to="/dashboard" className="group h-12 w-12 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95">
+                            <ArrowLeft size={20} className="text-slate-400 group-hover:text-white transition-colors" />
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold text-white tracking-tight">Team Management</h1>
-                            <p className="text-sm text-slate-500">Manage who has access to {activeWorkspace?.name}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Invite Section */}
-                    <div className="lg:col-span-1">
-                        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 sticky top-8">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="p-2 rounded-lg bg-blue-600/10 text-blue-400">
-                                    <UserPlus size={20} />
-                                </div>
-                                <h2 className="font-bold text-white">Invite Member</h2>
+                            <div className="flex items-center gap-3 mb-1">
+                                <h1 className="text-3xl font-black text-white tracking-tighter">Team Management</h1>
+                                <span className="px-2 py-0.5 rounded-md bg-blue-600/20 text-blue-400 text-[10px] font-black uppercase tracking-widest border border-blue-500/20">Admin</span>
                             </div>
-                            
-                            <form onSubmit={handleInvite} className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
-                                            <Mail size={16} />
-                                        </div>
-                                        <input
-                                            type="email"
-                                            value={inviteEmail}
-                                            onChange={(e) => setInviteEmail(e.target.value)}
-                                            className="block w-full rounded-lg border border-slate-700 bg-slate-800/50 py-2 pl-10 pr-3 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-                                            placeholder="teammate@company.com"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <button
-                                    type="submit"
-                                    disabled={inviting || !inviteEmail}
-                                    className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition-all disabled:opacity-50 shadow-lg shadow-blue-600/20"
+                            <p className="text-sm text-slate-500 flex items-center gap-2 font-medium">
+                                <Users size={14} /> Control access and roles for <span className="text-slate-300">{activeWorkspace?.name}</span>
+                            </p>
+                        </div>
+                    </div>
+                </header>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Invitation Control Panel */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="p-1 rounded-[2rem] bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
+                            <div className="flex p-1">
+                                <button 
+                                    onClick={() => setInviteMode('single')}
+                                    className={`flex-1 py-3 rounded-[1.5rem] text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${inviteMode === 'single' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'}`}
                                 >
-                                    {inviting ? <Loader2 className="animate-spin" size={18} /> : 'Send Invitation'}
+                                    <Mail size={14} /> Single
                                 </button>
-                                
-                                <p className="text-[10px] text-slate-500 text-center mt-4">
-                                    Invitees must already have a SaaSify account to be added directly.
-                                </p>
-                            </form>
+                                <button 
+                                    onClick={() => setInviteMode('bulk')}
+                                    className={`flex-1 py-3 rounded-[1.5rem] text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${inviteMode === 'bulk' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'}`}
+                                >
+                                    <Mail size={14} /> Bulk
+                                </button>
+                                <button 
+                                    onClick={() => setInviteMode('link')}
+                                    className={`flex-1 py-3 rounded-[1.5rem] text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${inviteMode === 'link' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'}`}
+                                >
+                                    <LinkIcon size={14} /> Link
+                                </button>
+                            </div>
+
+                            <div className="p-6 pt-4">
+                                {inviteMode === 'link' ? (
+                                    <div className="space-y-4">
+                                        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                                            <LinkIcon size={16} className="text-blue-400" /> Share Invite Link
+                                        </h3>
+                                        <p className="text-xs text-slate-500 leading-relaxed">
+                                            Anyone with this link can join your workspace. Be careful with who you share it with.
+                                        </p>
+                                        <div className="flex items-center gap-2 p-2 bg-black/40 border border-white/5 rounded-xl">
+                                            <div className="flex-1 truncate text-[10px] text-slate-400 font-mono px-2">
+                                                {window.location.origin}/join/{activeWorkspace?._id}
+                                            </div>
+                                            <button 
+                                                onClick={copyInviteLink}
+                                                className="h-10 px-4 rounded-lg bg-blue-600 text-white flex items-center justify-center gap-2 hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
+                                            >
+                                                {copied ? <Check size={16} /> : <Copy size={16} />}
+                                                <span className="text-xs font-bold uppercase tracking-widest">{copied ? 'Copied' : 'Copy'}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleInvite} className="space-y-5">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                                                {inviteMode === 'single' ? 'Recipient Email' : 'Email Addresses (comma separated)'}
+                                            </label>
+                                            <div className="relative group">
+                                                <div className="absolute top-4 left-4 text-slate-500 group-focus-within:text-blue-500 transition-colors">
+                                                    {inviteMode === 'single' ? <Mail size={18} /> : <Mail size={18} />}
+                                                </div>
+                                                {inviteMode === 'single' ? (
+                                                    <input
+                                                        type="email"
+                                                        value={inviteEmail}
+                                                        onChange={(e) => setInviteEmail(e.target.value)}
+                                                        className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-700"
+                                                        placeholder="name@company.com"
+                                                        required
+                                                    />
+                                                ) : (
+                                                    <textarea
+                                                        value={bulkEmails}
+                                                        onChange={(e) => setBulkEmails(e.target.value)}
+                                                        className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 transition-all placeholder:text-slate-700 min-h-[120px] resize-none"
+                                                        placeholder="john@example.com, sarah@company.com..."
+                                                        required
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={inviting || (inviteMode === 'single' ? !inviteEmail : !bulkEmails)}
+                                            className="w-full h-14 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all active:scale-95 shadow-xl shadow-blue-600/20 flex items-center justify-center gap-3"
+                                        >
+                                            {inviting ? (
+                                                <Loader2 size={20} className="animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <UserPlus size={18} />
+                                                    Send Invitations
+                                                </>
+                                            )}
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Summary Card */}
+                        <div className="p-8 rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-2xl relative overflow-hidden group">
+                           <div className="relative z-10">
+                             <h4 className="text-sm font-bold uppercase tracking-widest opacity-80 mb-2">Team Capacity</h4>
+                             <div className="flex items-end gap-3 mb-6">
+                                <span className="text-5xl font-black">{members.length}</span>
+                                <span className="text-lg font-bold opacity-60 mb-1">/ 50 members</span>
+                             </div>
+                             <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+                                <div className="h-full bg-white rounded-full group-hover:scale-x-105 transition-transform origin-left" style={{ width: `${(members.length / 50) * 100}%` }}></div>
+                             </div>
+                           </div>
+                           <Users className="absolute -bottom-6 -right-6 text-white/5 group-hover:scale-110 transition-transform" size={160} />
                         </div>
                     </div>
 
-                    {/* Members List Section */}
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="flex items-center justify-between">
-                            <div className="relative flex-1 max-w-sm">
-                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 pointer-events-none">
-                                    <Search size={16} />
-                                </div>
-                                <input
-                                    type="text"
-                                    className="block w-full rounded-lg border border-slate-800 bg-slate-900/50 py-2 pl-10 pr-3 text-sm text-white focus:border-slate-700 focus:outline-none transition-all"
-                                    placeholder="Search members..."
+                    {/* Members Directory */}
+                    <div className="lg:col-span-8 flex flex-col gap-6">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="relative group flex-1 max-w-md">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Search by name, email or role..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-white/20 transition-all backdrop-blur-sm"
                                 />
                             </div>
-                            <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800">
-                                <Users size={14} />
-                                {members.length} Members
+                            <div className="flex items-center gap-4">
+                                <button className="h-12 px-6 rounded-2xl bg-white/5 border border-white/10 text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-2">
+                                    <Filter size={14} /> Filter
+                                </button>
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-900/80 border-b border-slate-800">
-                                    <tr>
-                                        <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Member</th>
-                                        <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Role</th>
-                                        <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Added</th>
-                                        <th className="px-6 py-4"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-800">
-                                    {loading ? (
-                                        <tr>
-                                            <td colSpan="4" className="px-6 py-12 text-center">
-                                                <Loader2 className="animate-spin mx-auto text-blue-500" size={32} />
-                                            </td>
+                        <div className="rounded-[2.5rem] bg-white/5 border border-white/10 shadow-2xl overflow-hidden backdrop-blur-md">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="border-b border-white/5">
+                                            <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Member Profile</th>
+                                            <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Access Level</th>
+                                            <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Activity</th>
+                                            <th className="px-8 py-6"></th>
                                         </tr>
-                                    ) : (
-                                        members.map((member) => (
-                                            <tr key={member._id} className="hover:bg-slate-800/30 transition-all group">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-9 w-9 rounded-full bg-slate-800 flex items-center justify-center text-sm font-bold text-blue-400 border border-slate-700">
-                                                            {member.user?.name?.charAt(0)}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-bold text-white leading-none mb-1">{member.user?.name}</p>
-                                                            <p className="text-xs text-slate-500">{member.user?.email}</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <Shield size={14} className={member.role === 'owner' ? 'text-blue-400' : 'text-slate-500'} />
-                                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                                                            member.role === 'owner' ? 'bg-blue-600/10 text-blue-400 border-blue-600/20' : 'bg-slate-800 text-slate-400 border-slate-700'
-                                                        }`}>
-                                                            {member.role}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-xs text-slate-500">
-                                                    {new Date(member.joinedAt || Date.now()).toLocaleDateString()}
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <button className="p-2 rounded-lg text-slate-500 hover:text-white hover:bg-slate-800 opacity-0 group-hover:opacity-100 transition-all">
-                                                        <MoreVertical size={16} />
-                                                    </button>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {loading ? (
+                                            <tr>
+                                                <td colSpan="4" className="px-8 py-20 text-center">
+                                                    <Loader2 className="animate-spin mx-auto text-blue-500" size={40} />
+                                                    <p className="mt-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Loading members...</p>
                                                 </td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                            
-                            {!loading && members.length === 0 && (
-                                <div className="p-12 text-center">
-                                    <Users className="mx-auto text-slate-700 mb-4" size={40} />
-                                    <p className="text-slate-500">No members found in this workspace yet.</p>
-                                </div>
-                            )}
+                                        ) : members.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="4" className="px-8 py-20 text-center">
+                                                    <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/10 text-slate-500">
+                                                        <Users size={32} />
+                                                    </div>
+                                                    <p className="text-lg font-bold text-slate-400">Your pack is empty</p>
+                                                    <p className="text-sm text-slate-600 mt-1">Start by inviting your first teammate!</p>
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            members.map((member) => (
+                                                <tr key={member._id} className="group hover:bg-white/[0.02] transition-colors">
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="relative">
+                                                                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center text-lg font-black text-blue-400 border border-blue-500/20 group-hover:scale-105 transition-transform">
+                                                                    {member.user?.name?.charAt(0)}
+                                                                </div>
+                                                                <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 bg-emerald-500 border-[2.5px] border-[#080808] rounded-full shadow-lg"></div>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-black text-white group-hover:text-blue-400 transition-colors">{member.user?.name}</p>
+                                                                <p className="text-xs text-slate-500 flex items-center gap-1.5"><Mail size={10} /> {member.user?.email}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-1.5 rounded-lg border ${member.role === 'owner' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-white/5 border-white/10 text-slate-400'}`}>
+                                                                <Shield size={14} />
+                                                            </div>
+                                                            <span className={`text-[10px] font-black uppercase tracking-widest ${member.role === 'owner' ? 'text-amber-500' : 'text-slate-400'}`}>
+                                                                {member.role}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-6">
+                                                        <div>
+                                                            <p className="text-xs text-slate-300 font-bold mb-1">Joined</p>
+                                                            <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">
+                                                                {new Date(member.joinedAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-500 hover:text-white hover:bg-white/10 transition-all group-hover:visible invisible">
+                                                                <MoreVertical size={18} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -214,3 +331,4 @@ const Team = () => {
 };
 
 export default Team;
+
