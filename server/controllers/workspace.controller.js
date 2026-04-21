@@ -30,8 +30,8 @@ export const getOne = async (req, res) => {
 export const inviteMember = async (req, res) => {
     try {
         const { email, role } = req.body;
-        const member = await workspaceService.addMember(req.params.id, email, role);
-        res.status(200).json({ success: true, member });
+        const result = await workspaceService.addMember(req.params.id, email, role, req.user._id);
+        res.status(200).json({ success: true, ...result });
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }

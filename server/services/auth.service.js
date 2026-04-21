@@ -1,23 +1,49 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.model.js';
-
+import Invitation from '../models/Invitation.model.js';
+import Workspace from '../models/Workspace.model.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/token.utils.js';
 
 export const registerUser = async (userData) => {
     const { name, email, password } = userData;
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
         throw new Error('User already exists');
     }
 
     const user = await User.create({
         name,
-        email,
+        email: email.toLowerCase(),
         password
     });
 
     if (user) {
+        // --- Invitation Fulfillment Logic ---
+        // Check for any pending invitations for this email
+        const pendingInvites = await Invitation.find({ 
+            email: user.email, 
+            status: 'pending' 
+        });
+
+        for (const invite of pendingInvites) {
+            const workspace = await Workspace.findById(invite.workspace);
+            if (workspace) {
+                // Add to workspace members
+                workspace.members.push({ user: user._id, role: invite.role });
+                await workspace.save();
+
+                // Add to user workspaces
+                await User.findByIdAndUpdate(user._id, {
+                    $push: { workspaces: { workspace: workspace._id, role: invite.role } }
+                });
+            }
+            // Mark invite as accepted
+            invite.status = 'accepted';
+            await invite.save();
+        }
+        // ------------------------------------
+
         const accessToken = generateAccessToken(user._id);
         const refreshToken = generateRefreshToken(user._id);
 

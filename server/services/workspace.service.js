@@ -1,6 +1,9 @@
 import Workspace from '../models/Workspace.model.js';
 import User from '../models/User.model.js';
+import Invitation from '../models/Invitation.model.js';
+import * as mailService from './mail.service.js';
 import slugify from 'slugify';
+import crypto from 'crypto';
 
 export const createWorkspace = async (workspaceData, userId) => {
     const { name } = workspaceData;
@@ -48,27 +51,63 @@ export const getWorkspaceById = async (workspaceId, userId) => {
     return workspace;
 };
 
-export const addMember = async (workspaceId, email, role = 'member') => {
+export const addMember = async (workspaceId, email, role = 'member', inviterId) => {
     const workspace = await Workspace.findById(workspaceId);
     if (!workspace) throw new Error('Workspace not found');
 
-    const user = await User.findOne({ email });
-    if (!user) throw new Error('User not found. They must register first.');
+    const user = await User.findOne({ email: email.toLowerCase() });
+    
+    // 1. If user exists, add them directly
+    if (user) {
+        const isMember = workspace.members.some(m => m.user.toString() === user._id.toString());
+        if (isMember) throw new Error('User is already a member');
 
-    // Check if already a member
-    const isMember = workspace.members.some(m => m.user.toString() === user._id.toString());
-    if (isMember) throw new Error('User is already a member of this workspace');
+        workspace.members.push({ user: user._id, role });
+        await workspace.save();
 
-    // Add to workspace
-    workspace.members.push({ user: user._id, role });
-    await workspace.save();
+        await User.findByIdAndUpdate(user._id, {
+            $push: { workspaces: { workspace: workspace._id, role } }
+        });
 
-    // Add to user
-    await User.findByIdAndUpdate(user._id, {
-        $push: { workspaces: { workspace: workspace._id, role } }
+        // Optionally send a notification email anyway
+        const inviter = await User.findById(inviterId);
+        await mailService.sendInvitationEmail(
+            email, 
+            workspace.name, 
+            inviter?.name || 'A teammate',
+            `${process.env.FRONTEND_URL || 'http://localhost:5174'}`
+        );
+
+        return { user, status: 'added' };
+    }
+
+    // 2. If user doesn't exist, create a pending invitation
+    const token = crypto.randomBytes(32).toString('hex');
+    
+    // Check if there's already a pending invite for this email in this workspace
+    const existingInvite = await Invitation.findOne({ email: email.toLowerCase(), workspace: workspaceId, status: 'pending' });
+    if (existingInvite) throw new Error('Invitation already sent to this email');
+
+    const invitation = await Invitation.create({
+        email: email.toLowerCase(),
+        workspace: workspaceId,
+        inviter: inviterId,
+        role,
+        token
     });
 
-    return user;
+    // Send the email
+    const inviter = await User.findById(inviterId);
+    const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:5174'}/register?token=${token}&email=${email}`;
+    
+    await mailService.sendInvitationEmail(
+        email, 
+        workspace.name, 
+        inviter?.name || 'A teammate', 
+        inviteLink
+    );
+
+    return { invitation, status: 'invited' };
 };
 
 export const getMembers = async (workspaceId) => {

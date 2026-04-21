@@ -1,0 +1,52 @@
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+/**
+ * Mail Service:
+ * Handles sending transactional emails using SMTP.
+ */
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+    port: process.env.SMTP_PORT || 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: process.env.SMTP_USER || 'placeholder',
+        pass: process.env.SMTP_PASS || 'placeholder',
+    },
+});
+
+export const sendInvitationEmail = async (email, workspaceName, inviterName, inviteLink) => {
+    const mailOptions = {
+        from: `"SaaSify Team" <${process.env.FROM_EMAIL || 'no-reply@saasify.com'}>`,
+        to: email,
+        subject: `You've been invited to join ${workspaceName} on SaaSify`,
+        html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                <h2 style="color: #2563eb;">Join your team on SaaSify</h2>
+                <p>Hello,</p>
+                <p><strong>${inviterName}</strong> has invited you to join the <strong>${workspaceName}</strong> workspace on SaaSify.</p>
+                <div style="margin: 30px 0;">
+                    <a href="${inviteLink}" style="background-color: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accept Invitation</a>
+                </div>
+                <p style="color: #666; font-size: 14px;">If you don't have an account, you'll be asked to create one. This invitation link will expire in 7 days.</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                <p style="color: #999; font-size: 12px;">If you didn't expect this invite, you can safely ignore this email.</p>
+            </div>
+        `
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Message sent: %s', info.messageId);
+        // If using ethereal, log the preview URL
+        if (process.env.SMTP_HOST === 'smtp.ethereal.email' || !process.env.SMTP_HOST) {
+            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        }
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
+};
