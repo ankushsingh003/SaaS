@@ -98,7 +98,7 @@ export const addMember = async (workspaceId, email, role = 'member', inviterId) 
 
     // Send the email
     const inviter = await User.findById(inviterId);
-    const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:5174'}/register?token=${token}&email=${email}`;
+    const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:5174'}/invite/${token}`;
     
     await mailService.sendInvitationEmail(
         email, 

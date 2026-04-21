@@ -12,6 +12,7 @@ import initSocket from './config/socket.js';
 import authRoutes from './routes/auth.routes.js';
 import workspaceRoutes from './routes/workspace.routes.js';
 import billingRoutes from './routes/billing.routes.js';
+import invitationRoutes from './routes/invitation.routes.js';
 import { errorHandler } from './middleware/error.middleware.js';
 
 dotenv.config();
@@ -44,6 +45,7 @@ app.use('/api/', limiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/workspaces', workspaceRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/invitations', invitationRoutes);
 
 app.get('/', (req, res) => {
     res.send('SaaS Analytics API is running...');

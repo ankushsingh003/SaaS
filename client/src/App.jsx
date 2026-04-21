@@ -6,21 +6,15 @@ import Home from './pages/Home';
 import MeetingRoom from './pages/MeetingRoom';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Billing from './pages/Billing';
 import CreateWorkspace from './pages/CreateWorkspace';
-import Pricing from './pages/Pricing';
+import Join from './pages/Join';
+import ProtectedRoute from './components/ProtectedRoute';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
 import Landing from './pages/Landing';
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useSelector((state) => state.auth);
-  
-  if (loading) {
-    return <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">Loading...</div>;
-  }
-  
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
+// ... (imports remain)
 
 function App() {
   const dispatch = useDispatch();
@@ -38,6 +32,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/invite/:token" element={<Join />} />
           <Route 
             path="/dashboard" 
             element={
