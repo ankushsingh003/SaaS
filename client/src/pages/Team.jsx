@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import api from '../services/api';
+import { fetchWorkspaces } from '../features/workspaces/workspaceSlice';
 import toast, { Toaster } from 'react-hot-toast';
 import { 
   Users, 
@@ -21,7 +22,8 @@ import {
 import { Link } from 'react-router-dom';
 
 const Team = () => {
-    const { activeWorkspace } = useSelector((state) => state.workspaces);
+    const dispatch = useDispatch();
+    const { activeWorkspace, list, loading: workspaceLoading } = useSelector((state) => state.workspaces);
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [inviteEmail, setInviteEmail] = useState('');
@@ -29,6 +31,12 @@ const Team = () => {
     const [inviting, setInviting] = useState(false);
     const [inviteMode, setInviteMode] = useState('single'); // single, bulk, link
     const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (list.length === 0 && !workspaceLoading) {
+            dispatch(fetchWorkspaces());
+        }
+    }, [dispatch, list.length, workspaceLoading]);
 
     useEffect(() => {
         if (activeWorkspace?._id) {
@@ -50,6 +58,11 @@ const Team = () => {
 
     const handleInvite = async (e) => {
         e.preventDefault();
+        if (!activeWorkspace?._id) {
+            toast.error('No active workspace selected');
+            return;
+        }
+        
         const emailsToInvite = inviteMode === 'single' 
             ? [inviteEmail.trim()] 
             : bulkEmails.split(/[\s,]+/).filter(e => e.includes('@'));
@@ -72,7 +85,9 @@ const Team = () => {
             setBulkEmails('');
             fetchMembers();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to invite members');
+            console.error('Invite Error:', error);
+            const message = error.response?.data?.message || error.message || 'Failed to invite members';
+            toast.error(message);
         } finally {
             setInviting(false);
         }
