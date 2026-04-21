@@ -93,6 +93,37 @@ const Team = () => {
         }
     };
 
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showActions, setShowActions] = useState(null);
+
+    const handleRoleUpdate = async (userId, newRole) => {
+        try {
+            await api.patch(`/workspaces/${activeWorkspace._id}/members/${userId}`, { role: newRole });
+            toast.success(`Role updated to ${newRole}`);
+            fetchMembers();
+            setShowActions(null);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to update role');
+        }
+    };
+
+    const handleRemove = async (userId) => {
+        if (!window.confirm('Are you sure you want to remove this member?')) return;
+        try {
+            await api.delete(`/workspaces/${activeWorkspace._id}/members/${userId}`);
+            toast.success('Member removed');
+            fetchMembers();
+            setShowActions(null);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to remove member');
+        }
+    };
+
+    const filteredMembers = members.filter(m => 
+        m.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     const copyInviteLink = () => {
         const link = `${window.location.origin}/join/${activeWorkspace?._id}`;
         navigator.clipboard.writeText(link);
@@ -250,6 +281,8 @@ const Team = () => {
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
                                 <input 
                                     type="text" 
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Search by name, email or role..."
                                     className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white focus:outline-none focus:border-white/20 transition-all backdrop-blur-sm"
                                 />
@@ -280,19 +313,19 @@ const Team = () => {
                                                     <p className="mt-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Loading members...</p>
                                                 </td>
                                             </tr>
-                                        ) : members.length === 0 ? (
+                                        ) : filteredMembers.length === 0 ? (
                                             <tr>
                                                 <td colSpan="4" className="px-8 py-20 text-center">
                                                     <div className="h-16 w-16 rounded-3xl bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/10 text-slate-500">
                                                         <Users size={32} />
                                                     </div>
-                                                    <p className="text-lg font-bold text-slate-400">Your pack is empty</p>
-                                                    <p className="text-sm text-slate-600 mt-1">Start by inviting your first teammate!</p>
+                                                    <p className="text-lg font-bold text-slate-400">No members found</p>
+                                                    <p className="text-sm text-slate-600 mt-1">Try a different search term or invite someone!</p>
                                                 </td>
                                             </tr>
                                         ) : (
-                                            members.map((member) => (
-                                                <tr key={member._id} className="group hover:bg-white/[0.02] transition-colors">
+                                            filteredMembers.map((member) => (
+                                                <tr key={member._id} className="group hover:bg-white/[0.02] transition-colors relative">
                                                     <td className="px-8 py-6">
                                                         <div className="flex items-center gap-4">
                                                             <div className="relative">
@@ -309,10 +342,10 @@ const Team = () => {
                                                     </td>
                                                     <td className="px-8 py-6">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-1.5 rounded-lg border ${member.role === 'owner' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : 'bg-white/5 border-white/10 text-slate-400'}`}>
-                                                                <Shield size={14} />
+                                                            <div className={`p-1.5 rounded-lg border ${member.role === 'owner' ? 'bg-amber-500/10 border-amber-500/20 text-amber-500' : member.role === 'admin' ? 'bg-blue-500/10 border-blue-500/20 text-blue-500' : 'bg-white/5 border-white/10 text-slate-400'}`}>
+                                                                {member.role === 'owner' ? <Shield size={14} /> : <Shield size={14} />}
                                                             </div>
-                                                            <span className={`text-[10px] font-black uppercase tracking-widest ${member.role === 'owner' ? 'text-amber-500' : 'text-slate-400'}`}>
+                                                            <span className={`text-[10px] font-black uppercase tracking-widest ${member.role === 'owner' ? 'text-amber-500' : member.role === 'admin' ? 'text-blue-500' : 'text-slate-400'}`}>
                                                                 {member.role}
                                                             </span>
                                                         </div>
@@ -326,10 +359,48 @@ const Team = () => {
                                                         </div>
                                                     </td>
                                                     <td className="px-8 py-6 text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <button className="h-10 w-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-slate-500 hover:text-white hover:bg-white/10 transition-all group-hover:visible invisible">
+                                                        <div className="flex items-center justify-end gap-2 relative">
+                                                            <button 
+                                                                onClick={() => setShowActions(showActions === member.user._id ? null : member.user._id)}
+                                                                className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all ${showActions === member.user._id ? 'bg-blue-600 text-white' : 'bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 group-hover:opacity-100 opacity-0'}`}
+                                                            >
                                                                 <MoreVertical size={18} />
                                                             </button>
+
+                                                            {showActions === member.user._id && (
+                                                                <div className="absolute top-12 right-0 w-48 bg-[#0f172a] border border-white/10 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in duration-200">
+                                                                    <div className="p-2 text-[10px] font-black text-slate-600 uppercase tracking-widest">Settings</div>
+                                                                    
+                                                                    {member.role !== 'admin' && member.role !== 'owner' && (
+                                                                        <button 
+                                                                            onClick={() => handleRoleUpdate(member.user._id, 'admin')}
+                                                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-blue-400 transition-all"
+                                                                        >
+                                                                            <Shield size={14} /> Promote to Admin
+                                                                        </button>
+                                                                    )}
+                                                                    
+                                                                    {member.role === 'admin' && (
+                                                                        <button 
+                                                                            onClick={() => handleRoleUpdate(member.user._id, 'member')}
+                                                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-blue-400 transition-all"
+                                                                        >
+                                                                            <Users size={14} /> Demote to Member
+                                                                        </button>
+                                                                    )}
+
+                                                                    <div className="h-px bg-white/5 my-1"></div>
+                                                                    
+                                                                    {member.role !== 'owner' && (
+                                                                        <button 
+                                                                            onClick={() => handleRemove(member.user._id)}
+                                                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold text-red-400 hover:bg-red-500/10 transition-all"
+                                                                        >
+                                                                            <Trash2 size={14} /> Remove Member
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>

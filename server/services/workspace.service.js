@@ -143,3 +143,37 @@ export const updateWorkspace = async (workspaceId, updateData) => {
 
     return workspace;
 };
+
+export const updateMemberRole = async (workspaceId, userId, role) => {
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) throw new Error('Workspace not found');
+
+    const memberIndex = workspace.members.findIndex(m => m.user.toString() === userId);
+    if (memberIndex === -1) throw new Error('Member not found in this workspace');
+
+    workspace.members[memberIndex].role = role;
+    await workspace.save();
+
+    // Also update in User model
+    await User.findOneAndUpdate(
+        { _id: userId, 'workspaces.workspace': workspaceId },
+        { $set: { 'workspaces.$.role': role } }
+    );
+
+    return { message: 'Role updated successfully' };
+};
+
+export const removeMember = async (workspaceId, userId) => {
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) throw new Error('Workspace not found');
+
+    workspace.members = workspace.members.filter(m => m.user.toString() !== userId);
+    await workspace.save();
+
+    // Also remove from User model
+    await User.findByIdAndUpdate(userId, {
+        $pull: { workspaces: { workspace: workspaceId } }
+    });
+
+    return { message: 'Member removed successfully' };
+};

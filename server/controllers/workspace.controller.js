@@ -54,3 +54,22 @@ export const update = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
+
+export const updateMemberRole = async (req, res) => {
+    try {
+        const { role } = req.body;
+        const result = await workspaceService.updateMemberRole(req.params.id, req.params.userId, role);
+        res.status(200).json({ success: true, ...result });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+export const removeMember = async (req, res) => {
+    try {
+        const result = await workspaceService.removeMember(req.params.id, req.params.userId);
+        res.status(200).json({ success: true, ...result });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};

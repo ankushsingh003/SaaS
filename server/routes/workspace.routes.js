@@ -1,5 +1,14 @@
 import express from 'express';
-import { create, getAll, getOne, inviteMember, getMembers, update } from '../controllers/workspace.controller.js';
+import { 
+    create, 
+    getAll, 
+    getOne, 
+    inviteMember, 
+    getMembers, 
+    update,
+    updateMemberRole,
+    removeMember
+} from '../controllers/workspace.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import validate from '../middleware/validate.middleware.js';
 import { createWorkspaceSchema } from '../validations/workspace.validation.js';
@@ -14,5 +23,7 @@ router.get('/:id', getOne);
 router.get('/:id/members', getMembers);
 router.post('/:id/invite', inviteMember);
 router.patch('/:id', update);
+router.patch('/:id/members/:userId', updateMemberRole);
+router.delete('/:id/members/:userId', removeMember);
 
 export default router;
