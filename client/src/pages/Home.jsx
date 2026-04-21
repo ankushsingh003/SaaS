@@ -137,6 +137,80 @@ const Home = () => {
                     
 
 
+                    {/* Progress & Efficiency Section */}
+                    <section className="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        {/* Module Progress */}
+                        <div className="uplifter-card p-10">
+                            <div className="flex items-center justify-between mb-8">
+                                <h4 className="font-black text-xl tracking-tighter italic">Module Progress</h4>
+                                <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">View all</button>
+                            </div>
+                            <div className="space-y-8">
+                                {[
+                                    { name: "Auth module", progress: 95, color: "bg-emerald-500" },
+                                    { name: "Dashboard UI", progress: 68, color: "bg-blue-600" },
+                                    { name: "Billing module", progress: 42, color: "bg-amber-500" },
+                                    { name: "Testing suite", progress: 22, color: "bg-rose-500" },
+                                    { name: "API docs", progress: 80, color: "bg-indigo-500" },
+                                ].map((item, i) => (
+                                    <div key={i} className="group">
+                                        <div className="flex justify-between items-end mb-3">
+                                            <span className="text-sm font-bold text-slate-700 tracking-tight">{item.name}</span>
+                                            <span className="text-xs font-black text-slate-900 italic">{item.progress}%</span>
+                                        </div>
+                                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                                            <div 
+                                                className={`h-full ${item.color} rounded-full group-hover:scale-x-105 transition-transform origin-left`} 
+                                                style={{ width: `${item.progress}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-12 pt-8 border-t border-slate-100 flex justify-between items-center">
+                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest italic font-bold">Overall sprint health</span>
+                                <span className="text-xl font-black text-emerald-500 italic">74%</span>
+                            </div>
+                        </div>
+
+                        {/* Completed - Efficiency */}
+                        <div className="uplifter-card p-10">
+                            <div className="flex items-center justify-between mb-8">
+                                <h4 className="font-black text-xl tracking-tighter italic">Completed — efficiency</h4>
+                                <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">History</button>
+                            </div>
+                            <div className="space-y-6">
+                                {[
+                                    { name: "MongoDB schemas", efficiency: 98, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                                    { name: "JWT auth middleware", efficiency: 95, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                                    { name: "Cloudinary setup", efficiency: 91, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                                    { name: "Redis sessions", efficiency: 72, color: "text-amber-500", bg: "bg-amber-500/10" },
+                                    { name: "Rate limiter", efficiency: 55, color: "text-rose-500", bg: "bg-rose-500/10" },
+                                ].map((item, i) => (
+                                    <div key={i} className="flex items-center justify-between group cursor-default">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                                                <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-400 line-through tracking-tight group-hover:text-slate-600 transition-colors">{item.name}</span>
+                                        </div>
+                                        <span className={`px-2 py-0.5 rounded-md ${item.bg} ${item.color} text-[10px] font-black italic`}>
+                                            {item.efficiency}%
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-12 h-32 w-full bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 flex items-center justify-between relative overflow-hidden group shadow-xl shadow-blue-600/20">
+                                <Users className="absolute -bottom-4 -right-4 text-white/5 group-hover:scale-110 transition-transform" size={100} />
+                                <div className="relative z-10">
+                                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1 italic">Weekly Goal</p>
+                                    <h5 className="text-white font-black text-xl italic">86% Achieved</h5>
+                                </div>
+                                <ArrowRight className="relative z-10 text-white group-hover:translate-x-2 transition-transform" />
+                            </div>
+                        </div>
+                    </section>
+
                     {/* Task Board Section */}
                     <section className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="uplifter-card p-10">
