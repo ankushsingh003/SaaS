@@ -213,8 +213,8 @@ const Home = () => {
                     </section>
 
                     {/* Task Board Section */}
-                    <section className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="uplifter-card p-10">
+                    <section className="col-span-12">
+                        <div className="uplifter-card p-10 max-w-4xl">
                             <div className="flex items-center justify-between mb-8">
                                 <h4 className="font-black text-xl tracking-tighter">Current Tasks</h4>
                                 <Plus size={20} className="text-slate-400 cursor-pointer hover:text-blue-500" />
@@ -228,24 +228,6 @@ const Home = () => {
                                     <div key={i} className="flex flex-col gap-3 p-5 bg-slate-100/50 rounded-3xl border border-transparent hover:border-slate-200 hover:bg-white transition-all cursor-pointer group">
                                         <span className={`tag-pill tag-${task.c} w-max`}>{task.p}</span>
                                         <p className="font-bold text-slate-800 text-sm group-hover:text-blue-600">{task.t}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="col-span-1 md:col-span-2 uplifter-card p-10 bg-slate-900 text-white relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-10">
-                                <Users size={120} className="text-white/5 rotate-[15deg]" />
-                            </div>
-                            <h4 className="text-2xl font-black tracking-tighter mb-10 relative z-10 italic">Team Presence</h4>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 relative z-10">
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="flex flex-col items-center gap-4">
-                                        <div className="h-16 w-16 rounded-[1.25rem] bg-white p-1 relative overflow-hidden group">
-                                            <img src={`/portrait_${i}.png`} className="w-full h-full object-cover rounded-xl group-hover:scale-110 transition-transform" alt="" />
-                                            <div className="absolute bottom-1 right-1 h-3 w-3 bg-emerald-500 border-2 border-white rounded-full"></div>
-                                        </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Active</p>
                                     </div>
                                 ))}
                             </div>
