@@ -150,7 +150,7 @@ const Home = () => {
                         </div>
                         <div className="flex items-start justify-between mb-4">
                             <div>
-                                <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2 italic">Digital Congress Center</h3>
+                                <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2 italic">Digital Conference Room</h3>
                                 <p className="text-sm text-slate-600 leading-relaxed max-w-xs font-medium">The classic version with event templates. Best for virtual conferences and one-time gatherings.</p>
                             </div>
                             <div className="h-12 w-12 rounded-2xl bg-white border border-blue-100 flex items-center justify-center text-blue-800 group-hover:bg-blue-800 group-hover:text-white transition-all shadow-sm">
