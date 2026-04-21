@@ -163,7 +163,6 @@ const Home = () => {
                     </div>
                 </div>
 
-                </div>
             </main>
         </div>
     );
