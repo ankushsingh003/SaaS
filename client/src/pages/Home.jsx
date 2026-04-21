@@ -8,7 +8,8 @@ import useSocket from '../hooks/useSocket';
 import { 
     LayoutDashboard, Users, Settings, CreditCard, 
     Video, Radio, MessageSquare, CheckSquare, 
-    Plus, Search, Bell, ChevronRight, Play, Mic, Monitor, LogOut
+    Plus, Search, Bell, ChevronRight, Play, Mic, Monitor, LogOut,
+    ArrowRight
 } from 'lucide-react';
 
 const Home = () => {
