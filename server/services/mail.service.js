@@ -45,18 +45,44 @@ export const sendInvitationEmail = async (email, workspaceName, inviterName, inv
     const mailOptions = {
         from: `"SaaSify Team" <${process.env.FROM_EMAIL || 'no-reply@saasify.com'}>`,
         to: email,
-        subject: `You've been invited to join ${workspaceName} on SaaSify`,
+        subject: `You've been invited to join ${workspaceName}`,
         html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2 style="color: #2563eb;">Join your team on SaaSify</h2>
-                <p>Hello,</p>
-                <p><strong>${inviterName}</strong> has invited you to join the <strong>${workspaceName}</strong> workspace on SaaSify.</p>
-                <div style="margin: 30px 0;">
-                    <a href="${inviteLink}" style="background-color: #2563eb; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Accept Invitation</a>
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 40px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px;">
+                <div style="margin-bottom: 30px;">
+                    <span style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 12px; font-weight: 800; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">Workspace Invitation</span>
                 </div>
-                <p style="color: #666; font-size: 14px;">If you don't have an account, you'll be asked to create one. This invitation link will expire in 7 days.</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="color: #999; font-size: 12px;">If you didn't expect this invite, you can safely ignore this email.</p>
+                
+                <h1 style="color: #0f172a; font-size: 28px; font-weight: 800; line-height: 1.2; margin-bottom: 20px; letter-spacing: -1px;">
+                    Join <span style="color: #2563eb;">${workspaceName}</span> on SaaSify
+                </h1>
+                
+                <p style="color: #475569; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                    Hello! <strong>${inviterName}</strong> has invited you to join their elite team space on SaaSify. You'll get access to premium dashboards, real-time collaboration, and team-wide analytics.
+                </p>
+                
+                <div style="margin: 40px 0;">
+                    <!-- Bulletproof Button -->
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td align="center" style="border-radius: 16px;" bgcolor="#2563eb">
+                                <a href="${inviteLink}" target="_blank" style="font-size: 18px; font-family: 'Segoe UI', Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 16px; padding: 18px 36px; border: 1px solid #2563eb; display: inline-block; font-weight: 800; letter-spacing: 1px;">
+                                    ACCEPT & JOIN TEAM
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <p style="color: #94a3b8; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
+                    <strong>Note:</strong> Since your workspace is currently in development, this button targets <code>${process.env.FRONTEND_URL || 'http://localhost:5174'}</code>.
+                </p>
+                
+                <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;" />
+                
+                <p style="color: #64748b; font-size: 12px;">
+                    If the button doesn't work, copy and paste this link into your browser:<br/>
+                    <a href="${inviteLink}" style="color: #2563eb;">${inviteLink}</a>
+                </p>
             </div>
         `
     };
