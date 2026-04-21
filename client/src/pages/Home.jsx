@@ -80,10 +80,7 @@ const Home = () => {
                         Meeting Room
                         <span className="tag-pill tag-blue ml-auto">Live</span>
                     </Link>
-                    <Link to="/meeting" className="sidebar-item-light">
-                        <Radio size={20} />
-                        Live Stream
-                    </Link>
+
                 </nav>
 
                 <div className="mt-auto pt-8 border-t border-slate-200">
