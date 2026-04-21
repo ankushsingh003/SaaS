@@ -7,17 +7,41 @@ dotenv.config();
  * Mail Service:
  * Handles sending transactional emails using SMTP.
  */
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-    port: process.env.SMTP_PORT || 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: process.env.SMTP_USER || 'placeholder',
-        pass: process.env.SMTP_PASS || 'placeholder',
-    },
-});
+let transporter;
+
+const createTransporter = async () => {
+    if (transporter) return transporter;
+
+    let auth;
+    if (process.env.SMTP_USER && process.env.SMTP_USER !== 'placeholder') {
+        auth = {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        };
+    } else {
+        // Create ethereal account automatically for dev
+        const testAccount = await nodemailer.createTestAccount();
+        auth = {
+            user: testAccount.user,
+            pass: testAccount.pass
+        };
+        console.log('--- Dev Email Service Initialized (Ethereal) ---');
+        console.log(`User: ${auth.user}`);
+        console.log('-------------------------------------------------');
+    }
+
+    transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+        port: process.env.SMTP_PORT || 587,
+        secure: false,
+        auth
+    });
+
+    return transporter;
+};
 
 export const sendInvitationEmail = async (email, workspaceName, inviterName, inviteLink) => {
+    const currentTransporter = await createTransporter();
     const mailOptions = {
         from: `"SaaSify Team" <${process.env.FROM_EMAIL || 'no-reply@saasify.com'}>`,
         to: email,
@@ -38,7 +62,7 @@ export const sendInvitationEmail = async (email, workspaceName, inviterName, inv
     };
 
     try {
-        const info = await transporter.sendMail(mailOptions);
+        const info = await currentTransporter.sendMail(mailOptions);
         console.log('Message sent: %s', info.messageId);
         // If using ethereal, log the preview URL
         if (process.env.SMTP_HOST === 'smtp.ethereal.email' || !process.env.SMTP_HOST) {
