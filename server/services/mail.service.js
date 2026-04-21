@@ -33,7 +33,7 @@ const createTransporter = async () => {
     transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.ethereal.email',
         port: process.env.SMTP_PORT || 587,
-        secure: false,
+        secure: process.env.SMTP_SECURE === 'true',
         auth
     });
 
